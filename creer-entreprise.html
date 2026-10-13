@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer mon entreprise — HANKA GROUP</title>
+<meta name="description" content="Créez votre entreprise en Côte d'Ivoire avec HANKA GROUP : choisissez votre forme juridique, votre ville et votre pack, en 3 étapes.">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <img src="assets/logo-hanka-mark-clair.png" alt="Logo HANKA GROUP">
+      <span class="logo-text">
+        <span class="logo-name">HANKA</span>
+        <span class="logo-group">GROUP</span>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav-cta">Demander un devis</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero" style="padding:3rem 0 2.5rem;">
+    <div class="container" style="grid-template-columns:1fr; text-align:center;">
+      <div>
+        <p class="hero-eyebrow">Création d'entreprise</p>
+        <h1>Créer mon entreprise</h1>
+        <p style="margin:0 auto;">Trois étapes simples : votre forme juridique, votre ville, vos coordonnées. Le prix s'affiche automatiquement.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wizard-section">
+    <div class="container wizard">
+
+      <ol class="wizard-steps" aria-label="Progression">
+        <li data-step="1">Forme juridique</li>
+        <li data-step="2">Ville</li>
+        <li data-step="3">Coordonnées</li>
+        <li data-step="4">Pack &amp; prix</li>
+      </ol>
+
+      <form id="form-creation" novalidate>
+
+        <!-- Étape 1 -->
+        <fieldset class="wizard-panel" data-panel="1">
+          <legend>1. Choisissez la forme juridique</legend>
+          <div class="forme-list" id="forme-list" role="radiogroup" aria-label="Forme juridique"></div>
+          <p class="wizard-error" data-error="1" hidden>Merci de choisir une forme juridique.</p>
+        </fieldset>
+
+        <!-- Étape 2 -->
+        <fieldset class="wizard-panel" data-panel="2" hidden>
+          <legend>2. Ville de l'entreprise</legend>
+          <label for="ville">Dans quelle ville votre entreprise sera-t-elle installée ?</label>
+          <select id="ville" name="ville" required>
+            <option value="">Sélectionner une ville...</option>
+          </select>
+          <p class="wizard-error" data-error="2" hidden>Merci de choisir une ville.</p>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost" data-prev>← Retour</button>
+            <button type="button" class="btn btn-primary" data-next>Continuer</button>
+          </div>
+        </fieldset>
+
+        <!-- Étape 3 -->
+        <fieldset class="wizard-panel" data-panel="3" hidden>
+          <legend>3. Vos coordonnées</legend>
+          <div class="form-row">
+            <div>
+              <label for="nom">Nom *</label>
+              <input type="text" id="nom" name="nom" autocomplete="family-name" maxlength="100" required>
+            </div>
+            <div>
+              <label for="prenom">Prénom *</label>
+              <input type="text" id="prenom" name="prenom" autocomplete="given-name" maxlength="100" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="telephone">Téléphone</label>
+              <input type="tel" id="telephone" name="telephone" autocomplete="tel" placeholder="Ex. 07 01 02 03 04" maxlength="20">
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="vous@exemple.com" maxlength="200">
+            </div>
+          </div>
+          <p class="wizard-hint">* Obligatoire. Indiquez au moins un téléphone <strong>ou</strong> un email pour être recontacté.</p>
+          <!-- Champ piège anti-robots, invisible pour les visiteurs -->
+          <div class="hp" aria-hidden="true">
+            <label for="site_web">Ne pas remplir</label>
+            <input type="text" id="site_web" name="site_web" tabindex="-1" autocomplete="off">
+          </div>
+          <p class="wizard-error" data-error="3" hidden></p>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost" data-prev>← Retour</button>
+            <button type="button" class="btn btn-primary" data-next>Voir le prix</button>
+          </div>
+        </fieldset>
+
+        <!-- Étape 4 : pack, récapitulatif, confirmation -->
+        <fieldset class="wizard-panel" data-panel="4" hidden>
+          <legend>4. Votre pack et votre prix</legend>
+          <div class="pack-list" id="pack-list" role="radiogroup" aria-label="Pack"></div>
+          <p class="wizard-error" data-error="4" hidden>Merci de choisir un pack.</p>
+
+          <div class="recap" id="recap" aria-live="polite"></div>
+
+          <label class="confirm-line">
+            <input type="checkbox" id="confirm-prix">
+            <span>Je confirme ce prix et souhaite être contacté(e) par HANKA GROUP pour lancer la création.</span>
+          </label>
+          <p class="wizard-error" data-error="envoi" hidden></p>
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost" data-prev>← Retour</button>
+            <button type="submit" class="btn btn-primary" id="btn-envoyer" disabled>Envoyer ma demande</button>
+          </div>
+        </fieldset>
+
+        <!-- Confirmation -->
+        <div class="wizard-panel wizard-done" data-panel="fin" hidden tabindex="-1">
+          <div class="done-icon" aria-hidden="true">✓</div>
+          <h2>Demande de création envoyée.</h2>
+          <p>Vous serez contacté dans les heures qui suivent.</p>
+          <p class="done-ref" id="done-ref"></p>
+          <a href="index.html" class="btn btn-primary">Retour à l'accueil</a>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img class="footer-logo" src="assets/logo-hanka-group-clair.png" alt="HANKA GROUP">
+        <p style="font-size:0.88rem; opacity:0.85; max-width:32ch;">Votre partenaire pour la création d'entreprise, la formation et le développement de votre activité à Abidjan.</p>
+        <p class="footer-tagline">Innover · Construire · Valoriser</p>
+      </div>
+      <div>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="tel:+2250172976418">+225 01 72 97 64 18</a></li>
+          <li><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></li>
+          <li>Abidjan, Riviera 2 — Côte d'Ivoire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="year"></span> HANKA GROUP. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data/creation-entreprise.js"></script>
+<script src="js/tarifs.js"></script>
+<script src="js/creer-entreprise.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

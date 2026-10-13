@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Espace admin — HANKA GROUP</title>
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <img src="assets/logo-hanka-mark-clair.png" alt="Logo HANKA GROUP">
+      <span class="logo-text">
+        <span class="logo-name">HANKA</span>
+        <span class="logo-group">GROUP</span>
+      </span>
+    </a>
+    <button type="button" class="btn btn-outline admin-logout" id="btn-deconnexion" hidden>Se déconnecter</button>
+  </nav>
+</header>
+
+<main class="admin-main">
+  <div class="container">
+
+    <!-- Connexion -->
+    <section class="admin-login" id="vue-connexion" hidden>
+      <h1>Espace admin</h1>
+      <p>Connectez-vous pour consulter les demandes de création d'entreprise.</p>
+      <form id="form-connexion">
+        <label for="admin-email">Email</label>
+        <input type="email" id="admin-email" autocomplete="username" required>
+        <label for="admin-mdp">Mot de passe</label>
+        <input type="password" id="admin-mdp" autocomplete="current-password" required>
+        <p class="wizard-error" id="erreur-connexion" hidden></p>
+        <button type="submit" class="btn btn-primary">Se connecter</button>
+      </form>
+    </section>
+
+    <!-- Tableau des demandes -->
+    <section id="vue-demandes" hidden>
+      <div class="admin-head">
+        <div>
+          <h1>Demandes de création d'entreprise</h1>
+          <p class="admin-sub" id="admin-compte"></p>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-actualiser">↻ Actualiser</button>
+      </div>
+
+      <div class="admin-filtres" role="tablist" aria-label="Filtrer par statut">
+        <button type="button" data-filtre="" aria-selected="true">Toutes <span></span></button>
+        <button type="button" data-filtre="nouveau">Nouvelles <span></span></button>
+        <button type="button" data-filtre="en_cours">En cours <span></span></button>
+        <button type="button" data-filtre="traite">Traitées <span></span></button>
+        <button type="button" data-filtre="annule">Annulées <span></span></button>
+      </div>
+
+      <p class="wizard-error" id="erreur-demandes" hidden></p>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Date</th>
+              <th>Client</th>
+              <th>Contact</th>
+              <th>Forme</th>
+              <th>Ville</th>
+              <th>Pack</th>
+              <th>Prix</th>
+              <th>Statut</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="liste-demandes"></tbody>
+        </table>
+      </div>
+      <p class="admin-vide" id="admin-vide" hidden>Aucune demande pour ce filtre.</p>
+    </section>
+
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/data/creation-entreprise.js"></script>
+<script src="js/tarifs.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
