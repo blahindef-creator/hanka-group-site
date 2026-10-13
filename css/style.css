@@ -348,6 +348,12 @@ section { padding: 4rem 0; }
   grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
 }
+/* Nombre impair d'atouts : le dernier est centré sous les autres */
+.features > .feature:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: calc(50% - 0.625rem);
+}
 .feature {
   display: flex;
   gap: 1rem;
@@ -490,6 +496,7 @@ textarea { resize: vertical; min-height: 110px; }
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .steps { grid-template-columns: repeat(2, 1fr); }
   .features { grid-template-columns: 1fr; }
+  .features > .feature:last-child:nth-child(odd) { width: auto; justify-self: stretch; }
   .about-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
