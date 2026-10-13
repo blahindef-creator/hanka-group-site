@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>README — HANKA GROUP</title>
+<style>
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1b2030; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.55; }
+  h1 { color: #0c2d7a; border-bottom: 3px solid #f5b921; padding-bottom: 0.4rem; }
+  h2 { color: #0c2d7a; margin-top: 2rem; }
+  h3 { color: #1746b3; }
+  code, pre { background: #f0f2f7; border-radius: 6px; }
+  pre { padding: 0.9rem; overflow-x: auto; }
+  code { padding: 0.1rem 0.35rem; font-size: 0.92em; }
+  ul { padding-left: 1.3rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+  th, td { border: 1px solid #c7cede; padding: 0.5rem 0.7rem; text-align: left; font-size: 0.92rem; }
+  th { background: #eceff5; }
+  a { color: #1746b3; }
+  .checklist li { list-style: none; }
+  .checklist li::before { content: "☐ "; }
+  hr { border: none; border-top: 1px solid #c7cede; margin: 2rem 0; }
+</style>
+</head>
+<body>
+
+<h1>Site web HANKA GROUP</h1>
+
+<h2>En une phrase</h2>
+<p>Un site vitrine pour HANKA GROUP (Abidjan, Riviera 2), présentant ses 6 services
+(création d'entreprise, formation marchés publics et privés, formation certifiante,
+procédures administratives, immobilier, communication digitale), avec un formulaire de
+contact.</p>
+
+<h2>Ce qui a été livré</h2>
+<ul>
+  <li>Le code source complet du site (HTML/CSS/JS), dans le dossier <code>hanka-group-site/</code>.</li>
+  <li>Un suivi de version Git local, avec un premier commit enregistrant tout le squelette du site.</li>
+  <li>Ce README, qui explique tout ce qu'il reste à faire pour mettre le site en ligne.</li>
+</ul>
+<p><strong>Important : le site n'est pas encore en ligne.</strong> Il faut d'abord créer un
+compte GitHub (étape 1), puis un compte sur l'hébergeur choisi (Netlify, étape 2), avant
+de pouvoir obtenir une adresse publique.</p>
+
+<h2>Contenu à finaliser avant la mise en ligne définitive</h2>
+<p>Beaucoup de textes du site sont volontairement marqués <code>[Texte à valider]</code>
+ou <code>[à confirmer]</code> — des contenus provisoires rédigés pour que le site ait une
+structure complète, à relire et corriger avec la cliente avant publication officielle.</p>
+<ul>
+  <li>Les textes d'accroche (accueil, à propos, descriptions détaillées des 6 services).</li>
+  <li>Une vraie photo (équipe, locaux, ou visuel de marque) pour remplacer les emplacements réservés.</li>
+  <li>Les horaires d'ouverture exacts.</li>
+  <li>Les 4 "atouts" / "valeurs" de l'entreprise.</li>
+  <li>La liste exacte des prestations pour chacun des 6 services.</li>
+</ul>
+
+<h2>Les couleurs et le logo</h2>
+<p>Reprise de l'esprit de la bannière existante (bleu profond + doré/jaune, "HANKA" en
+blanc, "GROUP" en doré) pour un logo texte recréé en CSS. Si un fichier logo officiel
+existe, il pourra remplacer ce texte stylisé à tout moment.</p>
+
+<h2>Étape 1 — Créer un compte GitHub (gratuit, 2 minutes)</h2>
+<ol>
+  <li>Aller sur <a href="https://github.com/signup">github.com/signup</a> et créer un compte gratuit.</li>
+  <li>Cliquer sur <strong>New repository</strong>.</li>
+  <li>Nom du dépôt : <code>hanka-group-site</code>.</li>
+  <li>Ne cocher aucune case d'initialisation.</li>
+  <li>Cliquer sur <strong>Create repository</strong>.</li>
+  <li>Garder l'adresse affichée (<code>https://github.com/&lt;ton-nom&gt;/hanka-group-site.git</code>).</li>
+</ol>
+
+<h3>Envoyer le code sur GitHub</h3>
+<pre>git remote add origin https://github.com/&lt;ton-nom&gt;/hanka-group-site.git
+git branch -M main
+git push -u origin main</pre>
+
+<h2>Étape 2 — Mettre le site en ligne avec Netlify (gratuit)</h2>
+<ol>
+  <li>Aller sur <a href="https://app.netlify.com/signup">app.netlify.com/signup</a> et se connecter avec GitHub.</li>
+  <li><strong>Add new site</strong> ▸ <strong>Import an existing project</strong>.</li>
+  <li>Choisir GitHub, autoriser l'accès, sélectionner <code>hanka-group-site</code>.</li>
+  <li>Laisser les champs de build vides et cliquer sur <strong>Deploy</strong>.</li>
+  <li>Netlify fournit une adresse du type <code>https://hanka-group-xxxxx.netlify.app</code>.</li>
+</ol>
+<p>À chaque <code>git push</code>, Netlify republie automatiquement le site en 1-2 minutes.</p>
+
+<h2>Étape 3 — Nom de domaine personnalisé (optionnel, plus tard)</h2>
+<ol>
+  <li>Acheter un nom de domaine (Namecheap, OVH, ou via Netlify ▸ Domain settings).</li>
+  <li>Dans Netlify ▸ <strong>Domain settings</strong> ▸ <strong>Add a domain</strong>, suivre les instructions DNS.</li>
+  <li>Le certificat HTTPS est fourni gratuitement une fois le domaine connecté.</li>
+</ol>
+
+<h2>Sauvegardes et historique des versions</h2>
+<p>Chaque étape importante est enregistrée comme un "commit" Git — un point de
+sauvegarde. Une fois le dépôt poussé sur GitHub, l'historique complet sera visible dans
+l'onglet <strong>Commits</strong> du dépôt.</p>
+
+<h2>Comment mettre à jour le contenu plus tard</h2>
+<ul>
+  <li>Textes et services : <code>index.html</code>, <code>services.html</code>, <code>a-propos.html</code>, <code>contact.html</code>.</li>
+  <li>Couleurs et style : <code>css/style.css</code> (variables en haut du fichier, section <code>:root</code>).</li>
+  <li>Après modification : <code>git add -A</code>, <code>git commit -m "..."</code>, <code>git push</code>.</li>
+</ul>
+
+<h2>Ta check-list à toi</h2>
+<ul class="checklist">
+  <li>Relire et valider tous les textes marqués <code>[Texte à valider]</code>.</li>
+  <li>Fournir une vraie photo/visuel pour l'accueil et la page à propos.</li>
+  <li>Créer un compte GitHub (étape 1).</li>
+  <li>Créer un compte Netlify et connecter le dépôt (étape 2).</li>
+  <li>Vérifier le site en ligne sur ordinateur et sur téléphone.</li>
+  <li>Tester le formulaire de contact.</li>
+  <li>Décider d'un nom de domaine personnalisé (étape 3).</li>
+</ul>
+
+<h2>Vérifier que ça fonctionne</h2>
+<ul>
+  <li>Ouvrir l'adresse Netlify sur ordinateur et sur téléphone.</li>
+  <li>Vérifier que les 4 pages s'affichent et que la navigation fonctionne.</li>
+  <li>Cliquer sur "Envoyer ma demande" : la messagerie doit s'ouvrir avec un message pré-rempli vers hanekatehe@gmail.com.</li>
+</ul>
+
+<h2>Si ça ne marche pas</h2>
+<table>
+<tr><th>Ce que tu vois</th><th>Cause probable</th><th>Quoi faire</th></tr>
+<tr><td>Le site ne se met pas à jour après un push</td><td>Dépôt Netlify mal connecté</td><td>Vérifier Netlify ▸ Site settings ▸ Build &amp; deploy</td></tr>
+<tr><td>Le formulaire n'ouvre rien</td><td>Pas de messagerie par défaut sur l'appareil</td><td>Configurer une messagerie, ou prévoir un service de formulaire type Formspree</td></tr>
+<tr><td>Logo/couleurs ne correspondent pas à la charte réelle</td><td>Logo recréé à partir d'une photo de bannière</td><td>Fournir le fichier logo officiel</td></tr>
+</table>
+
+<h2>À décider / en attente</h2>
+<ul>
+  <li>Compte GitHub de la cliente ou de l'utilisateur (à créer).</li>
+  <li>Nom de domaine personnalisé : à acheter ou non, et lequel.</li>
+  <li>Validation finale de tous les textes et visuels provisoires.</li>
+  <li>Confirmation de la liste exacte des prestations pour chaque service.</li>
+</ul>
+
+</body>
+</html>
