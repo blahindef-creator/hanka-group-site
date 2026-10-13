@@ -20,14 +20,62 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  var onglets = document.getElementById("admin-onglets");
+  var vues = {
+    demandes: vueDemandes,
+    compte: document.getElementById("vue-compte"),
+    collaborateurs: document.getElementById("vue-collaborateurs")
+  };
+  var utilisateurCourant = null;
+  var estPrincipal = false;
+
+  function afficherOnglet(nom) {
+    Object.keys(vues).forEach(function (k) { vues[k].hidden = k !== nom; });
+    onglets.querySelectorAll("button").forEach(function (b) {
+      if (b.getAttribute("data-onglet") === nom) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    });
+    if (nom === "collaborateurs") chargerAdmins();
+  }
+
+  onglets.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-onglet]");
+    if (b) afficherOnglet(b.getAttribute("data-onglet"));
+  });
+
   function afficher(session) {
+    var id = session ? session.user.id : null;
+    if (id === utilisateurCourant) return; // simple rafraîchissement du jeton ou mise à jour du profil
+    utilisateurCourant = id;
+
     vueConnexion.hidden = !!session;
-    vueDemandes.hidden = !session;
+    onglets.hidden = !session;
     btnDeconnexion.hidden = !session;
-    if (session) {
-      document.getElementById("admin-compte").textContent = "Connecté : " + session.user.email;
-      charger();
+    if (!session) {
+      Object.keys(vues).forEach(function (k) { vues[k].hidden = true; });
+      document.getElementById("alerte-mdp").hidden = true;
+      return;
     }
+
+    var meta = session.user.user_metadata || {};
+    document.getElementById("admin-compte").textContent = "Connecté : " + session.user.email;
+    document.getElementById("compte-infos").textContent = "Connecté : " + session.user.email + (meta.nom ? " (" + meta.nom + ")" : "");
+    document.getElementById("alerte-mdp").hidden = !meta.doit_changer_mdp;
+
+    // Rôle : seul l'administrateur principal voit l'onglet Collaborateurs
+    estPrincipal = false;
+    document.getElementById("onglet-collaborateurs").hidden = true;
+    sb.from("admins").select("role").ilike("email", session.user.email).maybeSingle().then(function (r) {
+      estPrincipal = !!(r.data && r.data.role === "principal");
+      document.getElementById("onglet-collaborateurs").hidden = !estPrincipal;
+      if (!vues.collaborateurs.hidden) {
+        if (estPrincipal) chargerAdmins();
+        else afficherOnglet("demandes");
+      }
+    });
+
+    afficherOnglet(meta.doit_changer_mdp ? "compte" : "demandes");
+    charger();
   }
 
   // --- Connexion ---
@@ -268,5 +316,124 @@ document.addEventListener("DOMContentLoaded", function () {
     if (id) enregistrer(id, { statut: e.target.value }, e.target);
     var idNote = e.target.getAttribute("data-note");
     if (idNote) enregistrer(idNote, { note_admin: e.target.value.trim() || null }, e.target);
+  });
+
+  // --- Mon compte : changement de mot de passe ---
+  document.getElementById("form-mdp").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var nouveau = document.getElementById("mdp-nouveau").value;
+    var confirmation = document.getElementById("mdp-confirmation").value;
+    var err = document.getElementById("mdp-erreur");
+    var ok = document.getElementById("mdp-succes");
+    err.hidden = true;
+    ok.hidden = true;
+
+    if (nouveau.length < 8) { err.textContent = "Le mot de passe doit faire au moins 8 caractères."; err.hidden = false; return; }
+    if (nouveau !== confirmation) { err.textContent = "Les deux mots de passe ne correspondent pas."; err.hidden = false; return; }
+
+    var bouton = e.target.querySelector("button[type=submit]");
+    bouton.disabled = true;
+    sb.auth.updateUser({ password: nouveau, data: { doit_changer_mdp: false } }).then(function (res) {
+      bouton.disabled = false;
+      if (res.error) {
+        err.textContent = /different|same/i.test(res.error.message)
+          ? "Le nouveau mot de passe doit être différent de l'ancien."
+          : "Modification impossible : " + res.error.message;
+        err.hidden = false;
+        return;
+      }
+      e.target.reset();
+      ok.hidden = false;
+      document.getElementById("alerte-mdp").hidden = true;
+    });
+  });
+
+  // --- Collaborateurs (administrateur principal) ---
+  var listeAdmins = document.getElementById("liste-admins");
+  var erreurCollab = document.getElementById("collab-erreur");
+
+  function appelerGestion(corpsRequete) {
+    return sb.functions.invoke("gerer-admins", { body: corpsRequete }).then(function (res) {
+      if (res.error) {
+        // Le message d'erreur précis est dans le corps de la réponse
+        var ctx = res.error.context;
+        return (ctx && ctx.json ? ctx.json() : Promise.resolve({})).then(function (d) {
+          throw new Error((d && d.erreur) || res.error.message);
+        });
+      }
+      return res.data;
+    });
+  }
+
+  function chargerAdmins() {
+    if (!estPrincipal) return;
+    erreurCollab.hidden = true;
+    appelerGestion({ action: "lister" }).then(function (d) {
+      listeAdmins.innerHTML = d.admins.map(function (a) {
+        var principal = a.role === "principal";
+        return "<tr>" +
+          "<td>" + echapper(a.nom || "—") + "</td>" +
+          "<td>" + echapper(a.email) + "</td>" +
+          "<td>" + (principal ? "Administrateur principal" : "Collaborateur") + "</td>" +
+          "<td>" + new Date(a.created_at).toLocaleDateString("fr-FR") + "</td>" +
+          "<td>" + (principal ? "" : '<button type="button" class="btn btn-ghost btn-petit" data-retirer="' + echapper(a.email) + '">Retirer</button>') + "</td>" +
+          "</tr>";
+      }).join("");
+    }).catch(function (err) {
+      erreurCollab.textContent = "Impossible de charger les comptes : " + err.message;
+      erreurCollab.hidden = false;
+    });
+  }
+
+  listeAdmins.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-retirer]");
+    if (!b) return;
+    var email = b.getAttribute("data-retirer");
+    // Confirmation en deux clics, sans boîte de dialogue
+    if (b.getAttribute("data-confirmer") !== "1") {
+      b.setAttribute("data-confirmer", "1");
+      b.textContent = "Confirmer le retrait ?";
+      b.classList.add("btn-danger");
+      return;
+    }
+    b.disabled = true;
+    appelerGestion({ action: "retirer", email: email }).then(chargerAdmins).catch(function (err) {
+      erreurCollab.textContent = "Retrait impossible : " + err.message;
+      erreurCollab.hidden = false;
+      b.disabled = false;
+    });
+  });
+
+  document.getElementById("btn-generer-mdp").addEventListener("click", function () {
+    var lettres = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    var octets = new Uint32Array(12);
+    window.crypto.getRandomValues(octets);
+    document.getElementById("collab-mdp").value = "Hanka-" + Array.prototype.map.call(octets, function (n) {
+      return lettres[n % lettres.length];
+    }).join("");
+  });
+
+  document.getElementById("form-collab").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var succes = document.getElementById("collab-succes");
+    succes.hidden = true;
+    erreurCollab.hidden = true;
+    var nom = document.getElementById("collab-nom").value.trim();
+    var email = document.getElementById("collab-email").value.trim().toLowerCase();
+    var mdp = document.getElementById("collab-mdp").value;
+    var bouton = e.target.querySelector("button[type=submit]");
+    bouton.disabled = true;
+
+    appelerGestion({ action: "creer", nom: nom, email: email, mot_de_passe: mdp }).then(function (d) {
+      succes.innerHTML = d.compte_existant
+        ? "Accès admin donné à <strong>" + echapper(email) + "</strong> (compte déjà existant : son mot de passe actuel reste valable)."
+        : "Compte créé. Identifiants à transmettre :<br>Email : <strong>" + echapper(email) + "</strong><br>Mot de passe provisoire : <strong>" + echapper(mdp) + "</strong><br>Adresse : " + echapper(location.href.split("#")[0]);
+      succes.hidden = false;
+      e.target.reset();
+      chargerAdmins();
+    }).catch(function (err) {
+      erreurCollab.textContent = "Création impossible : " + err.message;
+      erreurCollab.hidden = false;
+    }).then(function () { bouton.disabled = false; });
   });
 });

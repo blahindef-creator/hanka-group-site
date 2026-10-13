@@ -657,6 +657,7 @@ textarea { resize: vertical; min-height: 110px; }
 .admin-body { background: var(--gray-50); }
 .admin-main { padding: 2.5rem 0 4rem; }
 .admin-main .container { max-width: 1400px; }
+.admin-main section { padding: 0; }
 .admin-logout { padding: 0.5rem 1.1rem; font-size: 0.85rem; background: transparent; }
 .admin-login {
   max-width: 420px;
@@ -705,6 +706,49 @@ textarea { resize: vertical; min-height: 110px; }
 .admin-table tr.statut-nouveau td:first-child { border-left: 4px solid var(--gold); }
 .admin-table tr.statut-traite, .admin-table tr.statut-annule { opacity: 0.6; }
 .nowrap { white-space: nowrap; }
+.admin-onglets { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--gray-100); margin-bottom: 1.75rem; flex-wrap: wrap; }
+.admin-onglets button {
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+.admin-onglets button[aria-current="page"] { color: var(--blue-dark); border-bottom-color: var(--gold); }
+.admin-alerte {
+  margin: -0.75rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #fff6dc;
+  border: 1px solid var(--gold);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.admin-carte { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.75rem; max-width: 900px; }
+.admin-carte h1 { font-size: 1.5rem; color: var(--blue-dark); margin: 0; }
+.admin-carte .admin-table-wrap { box-shadow: none; border: 1px solid var(--gray-100); margin-top: 1.25rem; }
+.admin-table-compacte { min-width: 640px; }
+.admin-form { display: flex; flex-direction: column; gap: 0.5rem; max-width: 560px; margin-top: 1.75rem; }
+.admin-form h2 { font-size: 1.1rem; color: var(--blue-dark); margin: 0 0 0.5rem; }
+.admin-form .btn { align-self: flex-start; margin-top: 0.5rem; }
+.admin-form .form-row { margin-bottom: 0.25rem; }
+.input-bouton { display: flex; gap: 0.5rem; }
+.input-bouton .btn { flex-shrink: 0; margin: 0; padding: 0.5rem 1rem; }
+.admin-succes {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #e8f6ec;
+  color: #1d6b35;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.btn-petit { padding: 0.35rem 0.8rem; font-size: 0.8rem; }
+.btn-danger { border-color: #c62828; color: #c62828; }
 .admin-vide { text-align: center; color: var(--gray-600); padding: 2rem; }
 
 /* --- Pied de page --- */

@@ -40,6 +40,17 @@
       </form>
     </section>
 
+    <!-- Navigation de l'espace admin -->
+    <nav class="admin-onglets" id="admin-onglets" aria-label="Espace admin" hidden>
+      <button type="button" data-onglet="demandes" aria-current="page">Demandes</button>
+      <button type="button" data-onglet="compte">Mon compte</button>
+      <button type="button" data-onglet="collaborateurs" id="onglet-collaborateurs" hidden>Collaborateurs</button>
+    </nav>
+
+    <p class="admin-alerte" id="alerte-mdp" hidden>
+      Pour sécuriser votre compte, choisissez votre propre mot de passe dans « Mon compte ».
+    </p>
+
     <!-- Tableau des demandes -->
     <section id="vue-demandes" hidden>
       <div class="admin-head">
@@ -88,6 +99,65 @@
         </table>
       </div>
       <p class="admin-vide" id="admin-vide" hidden>Aucune demande pour ce filtre.</p>
+    </section>
+
+    <!-- Mon compte : changement de mot de passe -->
+    <section id="vue-compte" hidden>
+      <div class="admin-carte">
+        <h1>Mon compte</h1>
+        <p class="admin-sub" id="compte-infos"></p>
+        <form id="form-mdp" class="admin-form">
+          <h2>Changer mon mot de passe</h2>
+          <label for="mdp-nouveau">Nouveau mot de passe</label>
+          <input type="password" id="mdp-nouveau" autocomplete="new-password" minlength="8" required>
+          <label for="mdp-confirmation">Confirmer le nouveau mot de passe</label>
+          <input type="password" id="mdp-confirmation" autocomplete="new-password" minlength="8" required>
+          <p class="form-note">8 caractères minimum. Évitez un mot de passe déjà utilisé ailleurs.</p>
+          <p class="wizard-error" id="mdp-erreur" hidden></p>
+          <p class="admin-succes" id="mdp-succes" hidden>Mot de passe modifié.</p>
+          <button type="submit" class="btn btn-primary">Enregistrer le mot de passe</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Collaborateurs (admin principal uniquement) -->
+    <section id="vue-collaborateurs" hidden>
+      <div class="admin-carte">
+        <h1>Collaborateurs</h1>
+        <p class="admin-sub">Les collaborateurs peuvent consulter et traiter les demandes, et exporter les données. Seul l'administrateur principal gère les comptes.</p>
+
+        <div class="admin-table-wrap">
+          <table class="admin-table admin-table-compacte">
+            <thead>
+              <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Ajouté le</th><th></th></tr>
+            </thead>
+            <tbody id="liste-admins"></tbody>
+          </table>
+        </div>
+        <p class="wizard-error" id="collab-erreur" hidden></p>
+
+        <form id="form-collab" class="admin-form">
+          <h2>Ajouter un collaborateur</h2>
+          <div class="form-row">
+            <div>
+              <label for="collab-nom">Nom et prénom</label>
+              <input type="text" id="collab-nom" maxlength="100" required>
+            </div>
+            <div>
+              <label for="collab-email">Email</label>
+              <input type="email" id="collab-email" required>
+            </div>
+          </div>
+          <label for="collab-mdp">Mot de passe provisoire</label>
+          <div class="input-bouton">
+            <input type="text" id="collab-mdp" minlength="8" required autocomplete="off">
+            <button type="button" class="btn btn-ghost" id="btn-generer-mdp">Générer</button>
+          </div>
+          <p class="form-note">Transmettez ces identifiants au collaborateur. Il lui sera demandé de choisir son propre mot de passe à la première connexion.</p>
+          <p class="admin-succes" id="collab-succes" hidden></p>
+          <button type="submit" class="btn btn-primary">Créer le compte</button>
+        </form>
+      </div>
     </section>
 
   </div>
