@@ -1062,3 +1062,11 @@ input[type="file"] { padding: 0.5rem; background: var(--white); }
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   background: var(--gray-100);
 }
+
+/* En-tête sur ordinateur : logo à gauche, menu centré, bouton éventuel à droite */
+@media (min-width: 681px) {
+  .nav { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.5rem; }
+  .nav .logo { justify-self: start; }
+  .nav .nav-links { justify-self: center; }
+  .nav .nav-cta { justify-self: end; }
+}
