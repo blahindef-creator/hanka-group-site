@@ -47,7 +47,15 @@
           <h1>Demandes de création d'entreprise</h1>
           <p class="admin-sub" id="admin-compte"></p>
         </div>
-        <button type="button" class="btn btn-ghost" id="btn-actualiser">↻ Actualiser</button>
+        <div class="admin-actions">
+          <button type="button" class="btn btn-ghost" id="btn-actualiser">↻ Actualiser</button>
+          <span class="admin-export" role="group" aria-label="Exporter les demandes affichées">
+            <span class="admin-export-label">Exporter :</span>
+            <button type="button" class="btn btn-ghost" data-export="csv">CSV</button>
+            <button type="button" class="btn btn-ghost" data-export="xlsx">Excel</button>
+            <button type="button" class="btn btn-ghost" data-export="pdf">PDF</button>
+          </span>
+        </div>
       </div>
 
       <div class="admin-filtres" role="tablist" aria-label="Filtrer par statut">

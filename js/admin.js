@@ -117,6 +117,137 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btn-actualiser").addEventListener("click", charger);
 
+  // --- Export des demandes affichées (filtre en cours respecté) ---
+  var LIBS = {
+    xlsx: ["https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"],
+    pdf: [
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
+    ]
+  };
+  var COLONNES = ["N°", "Date", "Prénom", "Nom", "Téléphone", "Email", "Forme juridique", "Ville", "Pack", "Prix (FCFA)", "Statut", "Note"];
+
+  function chargerScripts(urls) {
+    return urls.reduce(function (p, url) {
+      return p.then(function () {
+        if (document.querySelector('script[src="' + url + '"]')) return;
+        return new Promise(function (ok, ko) {
+          var s = document.createElement("script");
+          s.src = url;
+          s.onload = ok;
+          s.onerror = function () { ko(new Error("Chargement impossible : " + url)); };
+          document.head.appendChild(s);
+        });
+      });
+    }, Promise.resolve());
+  }
+
+  function lignesExport() {
+    return demandes
+      .filter(function (d) { return !filtre || d.statut === filtre; })
+      .map(function (d) {
+        return [
+          d.numero,
+          new Date(d.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
+          d.prenom,
+          d.nom,
+          d.telephone || "",
+          d.email || "",
+          d.forme_juridique,
+          d.ville,
+          d.pack ? PACKS[d.pack].nom : "",
+          d.prix,
+          STATUTS[d.statut] || d.statut,
+          d.note_admin || ""
+        ];
+      });
+  }
+
+  function nomFichier(ext) {
+    var jour = new Date().toISOString().slice(0, 10);
+    return "demandes-hanka" + (filtre ? "-" + filtre : "") + "-" + jour + "." + ext;
+  }
+
+  function telecharger(blob, nom) {
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = nom;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  var exporteurs = {
+    csv: function (lignes) {
+      // Séparateur « ; » et BOM UTF-8 : s'ouvre correctement dans Excel en français
+      var cellule = function (v) {
+        var s = String(v == null ? "" : v);
+        return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+      };
+      var texte = [COLONNES].concat(lignes).map(function (l) { return l.map(cellule).join(";"); }).join("\r\n");
+      telecharger(new Blob(["﻿" + texte], { type: "text/csv;charset=utf-8" }), nomFichier("csv"));
+    },
+    xlsx: function (lignes) {
+      return chargerScripts(LIBS.xlsx).then(function () {
+        var feuille = XLSX.utils.aoa_to_sheet([COLONNES].concat(lignes));
+        feuille["!cols"] = [6, 16, 14, 14, 16, 26, 22, 16, 16, 12, 10, 30].map(function (w) { return { wch: w }; });
+        var classeur = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(classeur, feuille, "Demandes");
+        XLSX.writeFile(classeur, nomFichier("xlsx"));
+      });
+    },
+    pdf: function (lignes) {
+      return chargerScripts(LIBS.pdf).then(function () {
+        var doc = new window.jspdf.jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+        var total = lignes.reduce(function (s, l) { return s + l[9]; }, 0);
+        doc.setFontSize(16);
+        doc.text("HANKA GROUP — Demandes de création d'entreprise", 40, 40);
+        doc.setFontSize(9);
+        doc.setTextColor(90);
+        doc.text(
+          "Export du " + new Date().toLocaleString("fr-FR") +
+          " · Filtre : " + (filtre ? STATUTS[filtre] : "toutes") +
+          " · " + lignes.length + " demande(s) · Total : " + formaterFCFA(total),
+          40, 58
+        );
+        doc.autoTable({
+          startY: 72,
+          head: [COLONNES],
+          body: lignes.map(function (l) {
+            var copie = l.slice();
+            copie[0] = "#" + copie[0];
+            copie[9] = formaterFCFA(copie[9]);
+            return copie;
+          }),
+          styles: { fontSize: 7, cellPadding: 3, overflow: "linebreak" },
+          headStyles: { fillColor: [6, 27, 74], textColor: 255 },
+          alternateRowStyles: { fillColor: [247, 248, 251] },
+          margin: { left: 40, right: 40 }
+        });
+        doc.save(nomFichier("pdf"));
+      });
+    }
+  };
+
+  document.querySelector(".admin-export").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-export]");
+    if (!b) return;
+    var lignes = lignesExport();
+    if (!lignes.length) {
+      erreurDemandes.textContent = "Aucune demande à exporter pour ce filtre.";
+      erreurDemandes.hidden = false;
+      return;
+    }
+    erreurDemandes.hidden = true;
+    b.disabled = true;
+    Promise.resolve(exporteurs[b.getAttribute("data-export")](lignes))
+      .catch(function (err) {
+        erreurDemandes.textContent = "Export impossible : " + err.message;
+        erreurDemandes.hidden = false;
+      })
+      .then(function () { b.disabled = false; });
+  });
+
   // --- Mise à jour du statut et de la note ---
   function enregistrer(id, champs, el) {
     el.disabled = true;
