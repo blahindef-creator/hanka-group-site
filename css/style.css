@@ -858,3 +858,36 @@ textarea { resize: vertical; min-height: 110px; }
   .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
 }
+
+/* --- Chiffres clés (accueil) --- */
+.chiffres { padding: 2.5rem 0; background: var(--white); border-bottom: 1px solid var(--gray-100); }
+.chiffres-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; max-width: 900px; }
+.chiffre {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  color: var(--white);
+  box-shadow: var(--shadow);
+}
+.chiffre-valeur {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--gold);
+}
+.chiffre-valeur small {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--white);
+  opacity: 0.85;
+  margin-bottom: 0.25rem;
+}
+.chiffre-libelle { margin: 0.5rem 0 0; font-size: 1rem; font-weight: 600; }
+@media (max-width: 640px) {
+  .chiffres-grid { grid-template-columns: 1fr; }
+}
