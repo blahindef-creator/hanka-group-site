@@ -1070,3 +1070,33 @@ input[type="file"] { padding: 0.5rem; background: var(--white); }
   .nav .nav-links { justify-self: center; }
   .nav .nav-cta { justify-self: end; }
 }
+
+/* Bouton « Se connecter » en haut à droite (espace admin / collaborateurs) */
+.nav-droite { display: flex; align-items: center; gap: 0.75rem; }
+.nav-connexion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.05rem;
+  border: 2px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.nav-connexion:hover { background: var(--white); border-color: var(--white); color: var(--blue-dark); }
+@media (min-width: 681px) {
+  .nav .nav-droite { justify-self: end; }
+}
+@media (max-width: 680px) {
+  .nav-droite { margin-left: auto; order: 2; }
+  .nav-toggle { order: 3; }
+  .nav-droite .nav-cta, .nav.open .nav-droite .nav-cta { display: none; }
+  .nav-connexion { padding: 0.4rem 0.8rem; font-size: 0.82rem; }
+}
+@media (max-width: 380px) {
+  .nav-connexion { font-size: 0; gap: 0; padding: 0.45rem; }
+  .nav-connexion svg { width: 18px; height: 18px; }
+}
