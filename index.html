@@ -200,6 +200,27 @@
     </div>
   </section>
 
+  <section class="temoignages" id="temoignages" aria-labelledby="titre-temoignages" hidden>
+    <div class="container">
+      <div class="temoignages-head">
+        <h2 id="titre-temoignages">Nos clients <span>parlent de nous</span></h2>
+        <div class="temoignages-nav" aria-hidden="true">
+          <button type="button" class="temoignages-fleche" data-sens="-1" tabindex="-1">←</button>
+          <button type="button" class="temoignages-fleche" data-sens="1" tabindex="-1">→</button>
+        </div>
+      </div>
+      <ul class="temoignages-liste" id="temoignages-liste"></ul>
+    </div>
+  </section>
+
+  <div class="video-modale" id="video-modale" role="dialog" aria-modal="true" aria-label="Témoignage vidéo" hidden>
+    <div class="video-modale-fond" data-fermer></div>
+    <div class="video-modale-contenu">
+      <button type="button" class="video-modale-fermer" data-fermer aria-label="Fermer la vidéo">✕</button>
+      <div class="video-modale-lecteur" id="video-lecteur"></div>
+    </div>
+  </div>
+
   <section class="cta-band">
     <div class="container">
       <h2>Un projet, une démarche, une question ?</h2>
@@ -242,6 +263,8 @@
 </footer>
 
 <script src="js/script.js"></script>
+<script src="js/data/temoignages.js"></script>
+<script src="js/temoignages.js"></script>
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>
