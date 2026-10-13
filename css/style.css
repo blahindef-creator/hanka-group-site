@@ -173,6 +173,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--gray-100);
   max-width: 46ch;
 }
+.hero p.hero-eyebrow { max-width: none; color: var(--gold); }
 .hero-actions { display: flex; gap: 1rem; margin-top: 1.75rem; flex-wrap: wrap; }
 
 .btn {
@@ -402,6 +403,14 @@ section { padding: 4rem 0; }
   text-align: center;
   padding: 1.5rem;
   font-size: 0.9rem;
+}
+
+.service-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
 /* --- Contact --- */
