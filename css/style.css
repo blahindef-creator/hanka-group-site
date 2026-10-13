@@ -1100,3 +1100,80 @@ input[type="file"] { padding: 0.5rem; background: var(--white); }
   .nav-connexion { font-size: 0; gap: 0; padding: 0.45rem; }
   .nav-connexion svg { width: 18px; height: 18px; }
 }
+
+/* --- Connexion / inscription --- */
+.auth-section { padding: 3rem 0 4rem; background: var(--gray-50); }
+.auth-carte { max-width: 560px; margin: 0 auto; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+.auth-onglets { display: grid; grid-template-columns: 1fr 1fr; }
+.auth-onglets button {
+  padding: 1rem;
+  border: 0;
+  border-bottom: 3px solid var(--gray-100);
+  background: var(--gray-50);
+  font: inherit;
+  font-weight: 700;
+  color: var(--gray-600);
+  cursor: pointer;
+}
+.auth-onglets button[aria-selected="true"] { background: var(--white); color: var(--blue-dark); border-bottom-color: var(--gold); }
+.auth-form { display: flex; flex-direction: column; gap: 0.45rem; padding: 1.75rem; }
+.auth-form .form-row { margin-bottom: 0.25rem; }
+.auth-form .btn { margin-top: 0.75rem; }
+.auth-intro { margin: 0 0 0.75rem; color: var(--gray-600); font-size: 0.92rem; }
+.auth-aide { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--gray-600); text-align: center; }
+.auth-aide a { color: var(--blue); font-weight: 600; }
+
+/* --- Espace client --- */
+.espace-section { padding: 2.5rem 0 4rem; background: var(--gray-50); min-height: 60vh; }
+.espace-chargement { text-align: center; color: var(--gray-600); padding: 3rem 0; }
+.espace-entete { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.25rem; flex-wrap: wrap; margin-bottom: 2rem; }
+.espace-entete h1 { margin: 0.2rem 0 0; color: var(--blue-dark); font-size: clamp(1.6rem, 3vw, 2rem); }
+.espace-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+.espace-actions .btn { padding: 0.65rem 1.2rem; font-size: 0.9rem; }
+.espace-titre { font-size: 1.25rem; color: var(--blue-dark); margin: 0 0 1rem; }
+.espace-vide { background: var(--white); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+.espace-demandes { display: flex; flex-direction: column; gap: 1.25rem; }
+.espace-demande { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; border-left: 5px solid var(--gold); }
+.espace-demande.statut-en_cours { border-left-color: var(--blue-light); }
+.espace-demande.statut-traite { border-left-color: #2e9d57; }
+.espace-demande.statut-annule { border-left-color: var(--gray-300); opacity: 0.8; }
+.espace-demande-tete { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.espace-demande-tete h3 { margin: 0; color: var(--blue-dark); font-size: 1.1rem; }
+.espace-demande-tete .admin-sub { margin: 0.2rem 0 0; }
+.espace-statut { flex-shrink: 0; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.82rem; font-weight: 800; background: #fff3d1; color: #8a5a00; }
+.statut-en_cours .espace-statut { background: #e1eaff; color: var(--blue); }
+.statut-traite .espace-statut { background: #e3f5e9; color: #1d6b35; }
+.statut-annule .espace-statut { background: var(--gray-100); color: var(--gray-600); }
+.espace-statut-aide { margin: 0.6rem 0 1rem; font-size: 0.9rem; color: var(--gray-600); }
+.espace-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 0.75rem 1.5rem; margin: 0 0 1.25rem; }
+.espace-details dt { font-size: 0.78rem; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; }
+.espace-details dd { margin: 0.1rem 0 0; font-weight: 700; color: var(--gray-900); }
+.espace-docs { border-top: 1px solid var(--gray-100); padding-top: 1rem; }
+.espace-docs h4 { margin: 0 0 0.6rem; font-size: 0.95rem; color: var(--blue-dark); }
+.espace-docs ul { list-style: none; padding: 0; margin: 0 0 0.75rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.espace-docs li { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.5rem 0.75rem; background: var(--gray-50); border-radius: 8px; font-size: 0.9rem; overflow-wrap: anywhere; }
+.espace-docs li small { color: var(--gray-600); }
+.espace-doc-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+.lien-bouton { border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--blue); cursor: pointer; }
+.lien-danger { color: #c62828; }
+.espace-depot { display: inline-flex; position: relative; cursor: pointer; margin: 0; }
+.espace-depot input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.espace-depot span { padding: 0.55rem 1.1rem; border: 2px dashed var(--blue-light); border-radius: 999px; color: var(--blue); font-weight: 700; font-size: 0.9rem; }
+.espace-depot:hover span, .espace-depot:focus-within span { background: #eef3ff; }
+.espace-depot-etat { margin: 0.5rem 0 0; font-size: 0.88rem; font-weight: 600; color: var(--blue); }
+@media (max-width: 640px) {
+  .espace-demande-tete { flex-direction: column; }
+  .espace-docs li { flex-direction: column; align-items: flex-start; }
+}
+
+/* Parcours : client connecté / invitation à créer un compte */
+.wizard-connecte { margin: -0.5rem 0 1rem; padding: 0.65rem 0.9rem; border-radius: 8px; background: #eef3ff; font-size: 0.88rem; color: var(--blue-dark); }
+.wizard-connecte a { color: var(--blue); font-weight: 700; text-decoration: underline; }
+.wizard-connecte-ok { background: #e3f5e9; color: #1d6b35; font-weight: 600; }
+.done-compte { margin: -0.75rem auto 1.5rem; max-width: 46ch; font-size: 0.95rem; }
+.done-compte a { color: var(--blue); font-weight: 700; text-decoration: underline; }
+
+/* Espace admin : documents des clients et badge « Compte client » */
+.badge-compte { display: inline-block; margin-bottom: 0.35rem; padding: 0.15rem 0.55rem; border-radius: 999px; background: #e1eaff; color: var(--blue); font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
+.admin-docs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
+.admin-docs .lien-bouton { font-size: 0.8rem; text-align: left; overflow-wrap: anywhere; }

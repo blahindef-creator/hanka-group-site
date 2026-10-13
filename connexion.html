@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — HANKA GROUP</title>
+<meta name="description" content="Connectez-vous à votre espace HANKA GROUP ou créez votre compte client.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <img src="assets/logo-hanka-mark-clair.png" alt="Logo HANKA GROUP">
+      <span class="logo-text">
+        <span class="logo-name">HANKA</span>
+        <span class="logo-group">GROUP</span>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-droite">
+      <a href="connexion.html" class="nav-connexion"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Se connecter</a>
+      <a href="contact.html" class="nav-cta">Demander un devis</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="auth-section">
+    <div class="container">
+      <div class="auth-carte">
+        <div class="auth-onglets" role="tablist">
+          <button type="button" data-auth="connexion" aria-selected="true">Se connecter</button>
+          <button type="button" data-auth="inscription" aria-selected="false">Créer un compte</button>
+        </div>
+
+        <!-- Connexion -->
+        <form id="form-connexion" class="auth-form" data-vue="connexion">
+          <p class="auth-intro">Clients, administrateurs et collaborateurs : connectez-vous avec votre email et votre mot de passe.</p>
+          <label for="c-email">Email</label>
+          <input type="email" id="c-email" autocomplete="username" required>
+          <label for="c-mdp">Mot de passe</label>
+          <input type="password" id="c-mdp" autocomplete="current-password" required>
+          <p class="wizard-error" id="c-erreur" hidden></p>
+          <button type="submit" class="btn btn-primary">Se connecter</button>
+          <p class="auth-aide">Mot de passe oublié ? Appelez-nous au <a href="tel:+2250172976418">+225 01 72 97 64 18</a>.</p>
+        </form>
+
+        <!-- Inscription client -->
+        <form id="form-inscription" class="auth-form" data-vue="inscription" hidden novalidate>
+          <p class="auth-intro">Créez votre espace client pour suivre vos demandes et déposer vos documents. Le compte est facultatif : vous pouvez aussi faire une demande sans compte.</p>
+          <div class="form-row">
+            <div>
+              <label for="i-nom">Nom *</label>
+              <input type="text" id="i-nom" autocomplete="family-name" maxlength="100" required>
+            </div>
+            <div>
+              <label for="i-prenom">Prénom *</label>
+              <input type="text" id="i-prenom" autocomplete="given-name" maxlength="100" required>
+            </div>
+          </div>
+          <label for="i-telephone">Téléphone</label>
+          <input type="tel" id="i-telephone" autocomplete="tel" placeholder="Ex. 07 01 02 03 04" maxlength="20">
+          <label for="i-email">Email *</label>
+          <input type="email" id="i-email" autocomplete="email" required>
+          <label for="i-mdp">Mot de passe * (8 caractères minimum)</label>
+          <input type="password" id="i-mdp" autocomplete="new-password" minlength="8" required>
+          <label for="i-mdp2">Confirmer le mot de passe *</label>
+          <input type="password" id="i-mdp2" autocomplete="new-password" minlength="8" required>
+          <div class="hp" aria-hidden="true">
+            <label for="i-site">Ne pas remplir</label>
+            <input type="text" id="i-site" tabindex="-1" autocomplete="off">
+          </div>
+          <p class="wizard-error" id="i-erreur" hidden></p>
+          <button type="submit" class="btn btn-primary">Créer mon compte</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img class="footer-logo" src="assets/logo-hanka-group-clair.png" alt="HANKA GROUP">
+        <p style="font-size:0.88rem; opacity:0.85; max-width:32ch;">Votre partenaire pour la création d'entreprise, la formation et le développement de votre activité à Abidjan.</p>
+        <p class="footer-tagline">Innover · Construire · Valoriser</p>
+      </div>
+      <div>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="tel:+2250172976418">+225 01 72 97 64 18</a></li>
+          <li><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></li>
+          <li>Abidjan, Riviera 2 — Côte d'Ivoire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="year"></span> HANKA GROUP. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/connexion.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

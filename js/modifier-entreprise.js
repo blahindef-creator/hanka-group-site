@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var form = document.getElementById("form-modification");
   if (!form) return;
 
+  // Client connecté : coordonnées pré-remplies et demande ajoutée à son espace
+  hankaParcoursCompte();
+
   var etat = { etape: 1, forme: "" };
 
   var panneaux = form.querySelectorAll(".wizard-panel");
@@ -125,13 +128,11 @@ document.addEventListener("DOMContentLoaded", function () {
     btnEnvoyer.disabled = true;
     btnEnvoyer.textContent = "Envoi en cours...";
 
-    fetch(HANKA_CONFIG.supabaseUrl + "/functions/v1/creer-demande", {
+    // Session relue au moment de l'envoi (le jeton est renouvelé automatiquement)
+    hankaSession().then(function (sessionActuelle) {
+      return fetch(HANKA_CONFIG.supabaseUrl + "/functions/v1/creer-demande", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": HANKA_CONFIG.supabaseAnonKey,
-        "Authorization": "Bearer " + HANKA_CONFIG.supabaseAnonKey
-      },
+      headers: hankaEntetes(sessionActuelle),
       body: JSON.stringify({
         type: "modification",
         forme_actuelle: etat.forme,
@@ -143,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
         email: champ("email") || null,
         site_web: champ("site_web")
       })
+      });
     })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
       .then(function (res) {
@@ -150,6 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (res.data.numero) {
           document.getElementById("done-ref").textContent = "Référence de votre demande : M" + res.data.numero;
         }
+        hankaFinParcours(res.data.compte);
         afficherEtape("fin");
         form.querySelector('[data-panel="fin"]').focus();
       })

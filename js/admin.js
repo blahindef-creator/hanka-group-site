@@ -101,6 +101,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (id === utilisateurCourant) return; // simple rafraîchissement du jeton ou mise à jour du profil
     utilisateurCourant = id;
 
+    if (!session) return afficherEspace(null);
+    // Seuls les admins et collaborateurs entrent ici ; un compte client va dans son espace
+    vueConnexion.hidden = true;
+    sb.rpc("est_admin").then(function (r) {
+      if (r.data === true) afficherEspace(session);
+      else location.replace("mon-espace.html");
+    });
+  }
+
+  function afficherEspace(session) {
     vueConnexion.hidden = !!session;
     onglets.hidden = !session;
     btnDeconnexion.hidden = !session;
@@ -179,18 +189,52 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         demandes = res.data || [];
-        if (!demandes.length) {
-          // Lecture vide : soit aucune demande, soit compte non autorisé
-          sb.rpc("est_admin").then(function (r) {
-            if (r.data === false) {
-              erreurDemandes.textContent = "Ce compte n'a pas accès aux demandes. Contactez l'administrateur du site.";
-              erreurDemandes.hidden = false;
-            }
-          });
-        }
+        rendre();
+        chargerDocuments(typeCharge);
+      });
+  }
+
+  // Documents déposés par les clients sur les demandes affichées
+  var documentsParDemande = {};
+  function chargerDocuments(typeCharge) {
+    documentsParDemande = {};
+    var ids = demandes.map(function (d) { return d.id; });
+    if (!ids.length) return;
+    sb.from("documents").select("id, demande_id, nom_fichier, chemin, taille")
+      .eq("demande_type", typeCharge).in("demande_id", ids).order("created_at")
+      .then(function (res) {
+        if (res.error || typeCharge !== typeCourant) return;
+        res.data.forEach(function (doc) {
+          (documentsParDemande[doc.demande_id] = documentsParDemande[doc.demande_id] || []).push(doc);
+        });
         rendre();
       });
   }
+
+  function celluleDocuments(d) {
+    var docs = documentsParDemande[d.id] || [];
+    var compte = d.client_id ? '<span class="badge-compte" title="Demande envoyée depuis un compte client">Compte client</span>' : "";
+    if (!docs.length) return compte || '<span class="admin-sub">—</span>';
+    return compte + '<ul class="admin-docs">' + docs.map(function (doc) {
+      return '<li><button type="button" class="lien-bouton" data-doc="' + echapper(doc.chemin) + '">📄 ' + echapper(doc.nom_fichier) + "</button></li>";
+    }).join("") + "</ul>";
+  }
+
+  // Ouverture d'un document (lien temporaire de 5 minutes, stockage privé)
+  document.getElementById("liste-demandes").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-doc]");
+    if (!b) return;
+    var fenetre = window.open("", "_blank");
+    sb.storage.from("documents").createSignedUrl(b.getAttribute("data-doc"), 300).then(function (r) {
+      if (r.error) {
+        if (fenetre) fenetre.close();
+        erreurDemandes.textContent = "Document indisponible : " + r.error.message;
+        erreurDemandes.hidden = false;
+        return;
+      }
+      if (fenetre) fenetre.location = r.data.signedUrl; else location.href = r.data.signedUrl;
+    });
+  });
 
   function rendre() {
     document.querySelectorAll(".admin-filtres button").forEach(function (b) {
@@ -204,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("admin-vide").hidden = liste.length > 0;
 
     document.getElementById("entete-demandes").innerHTML = "<tr>" +
-      ["N°", "Date", "Client", "Contact"].concat(type().entetes, ["Statut", "Note"])
+      ["N°", "Date", "Client", "Contact", "Documents"].concat(type().entetes, ["Statut", "Note"])
         .map(function (t) { return "<th>" + t + "</th>"; }).join("") + "</tr>";
 
     corps.innerHTML = liste.map(function (d) {
@@ -221,6 +265,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "<td>" + date + "</td>" +
         "<td><strong>" + echapper(d.prenom + " " + d.nom) + "</strong></td>" +
         "<td>" + contact + "</td>" +
+        "<td>" + celluleDocuments(d) + "</td>" +
         type().cellules(d).map(function (c) { return "<td>" + c + "</td>"; }).join("") +
         '<td><select data-statut="' + d.id + '" aria-label="Statut de la demande ' + d.numero + '">' + options + "</select></td>" +
         '<td><textarea data-note="' + d.id + '" rows="2" placeholder="Note interne...">' + echapper(d.note_admin || "") + "</textarea></td>" +

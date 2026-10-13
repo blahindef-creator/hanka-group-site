@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon espace client — HANKA GROUP</title>
+<meta name="description" content="Suivez vos demandes de création et de modification d'entreprise et déposez vos documents.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <img src="assets/logo-hanka-mark-clair.png" alt="Logo HANKA GROUP">
+      <span class="logo-text">
+        <span class="logo-name">HANKA</span>
+        <span class="logo-group">GROUP</span>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-droite">
+      <a href="connexion.html" class="nav-connexion"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Se connecter</a>
+      <a href="contact.html" class="nav-cta">Demander un devis</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="espace-section">
+    <div class="container">
+
+      <p class="espace-chargement" id="espace-chargement">Chargement de votre espace...</p>
+
+      <div id="espace" hidden>
+        <div class="espace-entete">
+          <div>
+            <p class="section-eyebrow">Mon espace client</p>
+            <h1 id="espace-bonjour">Bonjour</h1>
+            <p class="admin-sub" id="espace-compte"></p>
+          </div>
+          <div class="espace-actions">
+            <a href="creer-entreprise.html" class="btn btn-primary">Créer une entreprise</a>
+            <a href="modifier-entreprise.html" class="btn btn-ghost">Modifier une entreprise</a>
+            <button type="button" class="btn btn-ghost" id="btn-deconnexion">Se déconnecter</button>
+          </div>
+        </div>
+
+        <h2 class="espace-titre">Mes demandes</h2>
+        <p class="wizard-error" id="espace-erreur" hidden></p>
+        <div class="espace-vide" id="espace-vide" hidden>
+          <p>Vous n'avez pas encore de demande liée à votre compte.</p>
+          <p class="form-note">Les demandes envoyées en étant connecté apparaissent ici. Une demande faite avant la création de votre compte n'y figure pas : contactez-nous si besoin.</p>
+        </div>
+        <div class="espace-demandes" id="espace-demandes"></div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img class="footer-logo" src="assets/logo-hanka-group-clair.png" alt="HANKA GROUP">
+        <p style="font-size:0.88rem; opacity:0.85; max-width:32ch;">Votre partenaire pour la création d'entreprise, la formation et le développement de votre activité à Abidjan.</p>
+        <p class="footer-tagline">Innover · Construire · Valoriser</p>
+      </div>
+      <div>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="tel:+2250172976418">+225 01 72 97 64 18</a></li>
+          <li><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></li>
+          <li>Abidjan, Riviera 2 — Côte d'Ivoire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="year"></span> HANKA GROUP. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/data/creation-entreprise.js"></script>
+<script src="js/tarifs.js"></script>
+<script src="js/mon-espace.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

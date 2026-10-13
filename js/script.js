@@ -1,6 +1,17 @@
 // HANKA GROUP — comportements simples côté client (menu mobile + validation de base)
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  // Déjà connecté (session enregistrée dans le navigateur) : « Se connecter » devient « Mon espace »
+  try {
+    var session = JSON.parse(localStorage.getItem("sb-caassokvbuuppimftcik-auth-token") || "null");
+    if (session && session.access_token) {
+      document.querySelectorAll(".nav-connexion").forEach(function (lien) {
+        lien.lastChild.textContent = "Mon espace";
+        lien.setAttribute("aria-label", "Mon espace");
+      });
+    }
+  } catch (e) { /* stockage indisponible : on garde « Se connecter » */ }
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.querySelector(".nav");
 
