@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var onglets = document.getElementById("admin-onglets");
   var vues = {
     demandes: vueDemandes,
+    temoignages: document.getElementById("vue-temoignages"),
     compte: document.getElementById("vue-compte"),
     collaborateurs: document.getElementById("vue-collaborateurs")
   };
@@ -87,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       else b.removeAttribute("aria-current");
     });
     if (nom === "collaborateurs") chargerAdmins();
+    if (nom === "temoignages") chargerTemoignages();
   }
 
   onglets.addEventListener("click", function (e) {
@@ -519,5 +521,229 @@ document.addEventListener("DOMContentLoaded", function () {
       erreurCollab.textContent = "Création impossible : " + err.message;
       erreurCollab.hidden = false;
     }).then(function () { bouton.disabled = false; });
+  });
+
+  // --- Témoignages vidéo (accueil) ---
+  var BUCKET = "temoignages";
+  var TAILLE_MAX = 50 * 1024 * 1024;
+  var temoignages = [];
+  var listeTemoi = document.getElementById("temoi-admin-liste");
+  var erreurTemoi = document.getElementById("temoi-erreur");
+
+  function idYoutube(url) {
+    var m = String(url || "").match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/))([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  function afficheDe(t) {
+    if (t.affiche_url) return t.affiche_url;
+    var id = idYoutube(t.video_url);
+    return id ? "https://i.ytimg.com/vi/" + id + "/hqdefault.jpg" : "";
+  }
+
+  function montrerErreurTemoi(message) {
+    erreurTemoi.textContent = message;
+    erreurTemoi.hidden = !message;
+  }
+
+  function chargerTemoignages() {
+    montrerErreurTemoi("");
+    sb.from("temoignages").select("*").order("ordre").order("created_at").then(function (res) {
+      if (res.error) return montrerErreurTemoi("Impossible de charger les témoignages : " + res.error.message);
+      temoignages = res.data || [];
+      rendreTemoignages();
+    });
+  }
+
+  function rendreTemoignages() {
+    document.getElementById("temoi-vide").hidden = temoignages.length > 0;
+    listeTemoi.innerHTML = temoignages.map(function (t, i) {
+      var image = afficheDe(t);
+      return '<li class="temoi-admin' + (t.publie ? "" : " temoi-masque") + '">' +
+        '<a class="temoi-admin-image" href="' + echapper(t.video_url) + '" target="_blank" rel="noopener" title="Voir la vidéo">' +
+        (image ? '<img src="' + echapper(image) + '" alt="">' : "<span>▶</span>") + "</a>" +
+        '<div class="temoi-admin-infos"><strong>' + echapper(t.nom) + "</strong>" +
+        (t.activite ? "<span>" + echapper(t.activite) + "</span>" : "") +
+        (t.service ? '<span class="temoignage-service">' + echapper(t.service) + "</span>" : "") +
+        '<span class="temoi-etat">' + (t.publie ? "● Publié sur le site" : "○ Masqué") + "</span></div>" +
+        '<div class="temoi-admin-actions">' +
+        '<button type="button" class="btn btn-ghost btn-petit" data-temoi-monter="' + i + '"' + (i === 0 ? " disabled" : "") + ' aria-label="Monter">↑</button>' +
+        '<button type="button" class="btn btn-ghost btn-petit" data-temoi-descendre="' + i + '"' + (i === temoignages.length - 1 ? " disabled" : "") + ' aria-label="Descendre">↓</button>' +
+        '<button type="button" class="btn btn-ghost btn-petit" data-temoi-publier="' + i + '">' + (t.publie ? "Masquer" : "Publier") + "</button>" +
+        '<button type="button" class="btn btn-ghost btn-petit" data-temoi-supprimer="' + i + '">Supprimer</button>' +
+        "</div></li>";
+    }).join("");
+  }
+
+  // Chemin de fichier dans le stockage à partir de son URL publique (pour la suppression)
+  function cheminStockage(url) {
+    var repere = "/storage/v1/object/public/" + BUCKET + "/";
+    var i = String(url || "").indexOf(repere);
+    return i === -1 ? null : decodeURIComponent(url.slice(i + repere.length));
+  }
+
+  listeTemoi.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    var i;
+
+    if (b.hasAttribute("data-temoi-monter") || b.hasAttribute("data-temoi-descendre")) {
+      i = Number(b.getAttribute("data-temoi-monter") || b.getAttribute("data-temoi-descendre"));
+      var j = b.hasAttribute("data-temoi-monter") ? i - 1 : i + 1;
+      var deplace = temoignages.splice(i, 1)[0];
+      temoignages.splice(j, 0, deplace);
+      rendreTemoignages();
+      // Renumérote l'ordre de toute la liste
+      Promise.all(temoignages.map(function (t, k) {
+        t.ordre = k;
+        return sb.from("temoignages").update({ ordre: k }).eq("id", t.id);
+      })).then(function (res) {
+        var err = res.filter(function (r) { return r.error; })[0];
+        if (err) montrerErreurTemoi("Ordre non enregistré : " + err.error.message);
+      });
+      return;
+    }
+
+    if (b.hasAttribute("data-temoi-publier")) {
+      var t = temoignages[Number(b.getAttribute("data-temoi-publier"))];
+      b.disabled = true;
+      sb.from("temoignages").update({ publie: !t.publie }).eq("id", t.id).then(function (res) {
+        if (res.error) { b.disabled = false; return montrerErreurTemoi("Modification impossible : " + res.error.message); }
+        t.publie = !t.publie;
+        rendreTemoignages();
+      });
+      return;
+    }
+
+    if (b.hasAttribute("data-temoi-supprimer")) {
+      // Confirmation en deux clics, sans boîte de dialogue
+      if (b.getAttribute("data-confirmer") !== "1") {
+        b.setAttribute("data-confirmer", "1");
+        b.textContent = "Confirmer la suppression ?";
+        b.classList.add("btn-danger");
+        return;
+      }
+      var cible = temoignages[Number(b.getAttribute("data-temoi-supprimer"))];
+      b.disabled = true;
+      sb.from("temoignages").delete().eq("id", cible.id).then(function (res) {
+        if (res.error) { b.disabled = false; return montrerErreurTemoi("Suppression impossible : " + res.error.message); }
+        var fichiers = [cheminStockage(cible.video_url), cheminStockage(cible.affiche_url)].filter(Boolean);
+        if (fichiers.length) sb.storage.from(BUCKET).remove(fichiers);
+        chargerTemoignages();
+      });
+    }
+  });
+
+  // Choix de la source vidéo : fichier ou YouTube
+  document.querySelectorAll('input[name="temoi-source"]').forEach(function (r) {
+    r.addEventListener("change", function () {
+      var youtube = document.querySelector('input[name="temoi-source"]:checked').value === "youtube";
+      document.getElementById("temoi-bloc-fichier").hidden = youtube;
+      document.getElementById("temoi-bloc-youtube").hidden = !youtube;
+    });
+  });
+
+  // Image de couverture tirée de la vidéo (une image prise à 1 seconde)
+  function couvertureDepuisVideo(fichier) {
+    return new Promise(function (ok) {
+      var video = document.createElement("video");
+      var url = URL.createObjectURL(fichier);
+      var fini = false;
+      var terminer = function (blob) {
+        if (fini) return;
+        fini = true;
+        URL.revokeObjectURL(url);
+        ok(blob);
+      };
+      video.muted = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      video.src = url;
+      video.addEventListener("loadeddata", function () {
+        video.currentTime = Math.min(1, (video.duration || 2) / 2);
+      });
+      video.addEventListener("seeked", function () {
+        try {
+          var cote = Math.min(video.videoWidth, video.videoHeight);
+          var canvas = document.createElement("canvas");
+          canvas.width = canvas.height = Math.min(cote, 720);
+          canvas.getContext("2d").drawImage(
+            video,
+            (video.videoWidth - cote) / 2, (video.videoHeight - cote) / 2, cote, cote,
+            0, 0, canvas.width, canvas.height
+          );
+          canvas.toBlob(terminer, "image/jpeg", 0.85);
+        } catch (err) {
+          terminer(null);
+        }
+      });
+      video.addEventListener("error", function () { terminer(null); });
+      setTimeout(function () { terminer(null); }, 15000); // format non lisible par le navigateur
+    });
+  }
+
+  function televerser(fichier, prefixe) {
+    var ext = (fichier.name && fichier.name.split(".").pop().toLowerCase()) || (fichier.type === "image/jpeg" ? "jpg" : "bin");
+    var chemin = prefixe + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
+    return sb.storage.from(BUCKET).upload(chemin, fichier, { contentType: fichier.type, upsert: false }).then(function (res) {
+      if (res.error) throw new Error(res.error.message);
+      return sb.storage.from(BUCKET).getPublicUrl(chemin).data.publicUrl;
+    });
+  }
+
+  document.getElementById("form-temoi").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var succes = document.getElementById("temoi-succes");
+    var bouton = document.getElementById("btn-temoi");
+    succes.hidden = true;
+    montrerErreurTemoi("");
+
+    var nom = document.getElementById("temoi-nom").value.trim();
+    var youtube = document.querySelector('input[name="temoi-source"]:checked').value === "youtube";
+    var lien = document.getElementById("temoi-youtube").value.trim();
+    var fichier = document.getElementById("temoi-fichier").files[0];
+    var affiche = document.getElementById("temoi-affiche").files[0];
+
+    if (!nom) return montrerErreurTemoi("Indiquez le nom du client.");
+    if (youtube && !idYoutube(lien)) return montrerErreurTemoi("Le lien YouTube n'est pas reconnu. Copiez le lien de partage de la vidéo (ex. https://youtu.be/...).");
+    if (!youtube && !fichier) return montrerErreurTemoi("Choisissez le fichier vidéo à téléverser.");
+    if (!youtube && fichier.size > TAILLE_MAX) return montrerErreurTemoi("La vidéo fait " + Math.round(fichier.size / 1048576) + " Mo : le maximum est 50 Mo. Raccourcissez-la ou utilisez un lien YouTube.");
+    if (affiche && affiche.size > 5 * 1048576) return montrerErreurTemoi("L'image de couverture doit faire moins de 5 Mo.");
+
+    bouton.disabled = true;
+    bouton.textContent = youtube ? "Enregistrement..." : "Envoi de la vidéo en cours... ne fermez pas la page";
+
+    var urlVideo = youtube ? Promise.resolve(lien) : televerser(fichier, "video");
+    var urlAffiche = affiche
+      ? televerser(affiche, "couverture")
+      : (youtube ? Promise.resolve(null) : couvertureDepuisVideo(fichier).then(function (blob) {
+          return blob ? televerser(new File([blob], "couverture.jpg", { type: "image/jpeg" }), "couverture") : null;
+        }));
+
+    Promise.all([urlVideo, urlAffiche]).then(function (urls) {
+      return sb.from("temoignages").insert({
+        nom: nom,
+        activite: document.getElementById("temoi-activite").value.trim() || null,
+        service: document.getElementById("temoi-service").value || null,
+        video_url: urls[0],
+        affiche_url: urls[1],
+        ordre: temoignages.length,
+        publie: true
+      }).then(function (res) {
+        if (res.error) throw new Error(res.error.message);
+      });
+    }).then(function () {
+      succes.textContent = "Témoignage ajouté et publié sur la page d'accueil.";
+      succes.hidden = false;
+      e.target.reset();
+      document.getElementById("temoi-bloc-fichier").hidden = false;
+      document.getElementById("temoi-bloc-youtube").hidden = true;
+      chargerTemoignages();
+    }).catch(function (err) {
+      montrerErreurTemoi("Ajout impossible : " + err.message);
+    }).then(function () {
+      bouton.disabled = false;
+      bouton.textContent = "Ajouter le témoignage";
+    });
   });
 });

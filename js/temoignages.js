@@ -1,10 +1,25 @@
 // Section « Nos clients parlent de nous » : cartes vidéo défilantes + lecture dans une fenêtre.
-// Les témoignages sont listés dans js/data/temoignages.js ; la section reste masquée si la liste est vide.
+// Les témoignages sont gérés depuis l'espace admin (onglet Témoignages) et lus dans la base ;
+// la section reste masquée tant qu'aucun témoignage n'est publié.
 
 document.addEventListener("DOMContentLoaded", function () {
   var section = document.getElementById("temoignages");
-  if (!section || typeof TEMOIGNAGES === "undefined" || !TEMOIGNAGES.length) return;
+  if (!section || typeof HANKA_CONFIG === "undefined") return;
 
+  fetch(HANKA_CONFIG.supabaseUrl + "/rest/v1/temoignages?select=nom,activite,service,video_url,affiche_url&publie=eq.true&order=ordre,created_at", {
+    headers: { apikey: HANKA_CONFIG.supabaseAnonKey, Authorization: "Bearer " + HANKA_CONFIG.supabaseAnonKey }
+  })
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .then(function (lignes) {
+      var liste = (lignes || []).map(function (l) {
+        return { nom: l.nom, activite: l.activite, service: l.service, video: l.video_url, affiche: l.affiche_url };
+      });
+      if (liste.length) afficherTemoignages(section, liste);
+    })
+    .catch(function () { /* section laissée masquée */ });
+});
+
+function afficherTemoignages(section, TEMOIGNAGES) {
   var liste = document.getElementById("temoignages-liste");
   var modale = document.getElementById("video-modale");
   var lecteur = document.getElementById("video-lecteur");
@@ -82,4 +97,4 @@ document.addEventListener("DOMContentLoaded", function () {
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !modale.hidden) fermer();
   });
-});
+}

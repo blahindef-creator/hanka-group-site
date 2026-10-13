@@ -43,6 +43,7 @@
     <!-- Navigation de l'espace admin -->
     <nav class="admin-onglets" id="admin-onglets" aria-label="Espace admin" hidden>
       <button type="button" data-onglet="demandes" aria-current="page">Demandes</button>
+      <button type="button" data-onglet="temoignages">Témoignages</button>
       <button type="button" data-onglet="compte">Mon compte</button>
       <button type="button" data-onglet="collaborateurs" id="onglet-collaborateurs" hidden>Collaborateurs</button>
     </nav>
@@ -91,6 +92,62 @@
         </table>
       </div>
       <p class="admin-vide" id="admin-vide" hidden>Aucune demande pour ce filtre.</p>
+    </section>
+
+    <!-- Témoignages vidéo affichés sur l'accueil -->
+    <section id="vue-temoignages" hidden>
+      <div class="admin-carte admin-carte-large">
+        <h1>Témoignages vidéo</h1>
+        <p class="admin-sub">Les témoignages publiés apparaissent sur la page d'accueil, dans « Nos clients parlent de nous », dans l'ordre ci-dessous.</p>
+
+        <p class="wizard-error" id="temoi-erreur" hidden></p>
+        <ul class="temoi-admin-liste" id="temoi-admin-liste"></ul>
+        <p class="admin-vide" id="temoi-vide" hidden>Aucun témoignage pour le moment. Ajoutez le premier ci-dessous.</p>
+
+        <form id="form-temoi" class="admin-form admin-form-large">
+          <h2>Ajouter un témoignage</h2>
+          <div class="form-row">
+            <div>
+              <label for="temoi-nom">Nom du client *</label>
+              <input type="text" id="temoi-nom" maxlength="100" placeholder="Ex. Awa K." required>
+            </div>
+            <div>
+              <label for="temoi-activite">Activité</label>
+              <input type="text" id="temoi-activite" maxlength="150" placeholder="Ex. Gérante, boutique de couture">
+            </div>
+          </div>
+          <label for="temoi-service">Service utilisé</label>
+          <select id="temoi-service">
+            <option value="">— Aucun —</option>
+            <option>Création d'entreprise</option>
+            <option>Modification d'entreprise</option>
+            <option>Formation certifiante en marchés publics</option>
+            <option>Procédures administratives</option>
+            <option>Immobilier</option>
+            <option>Communication digitale</option>
+          </select>
+
+          <fieldset class="temoi-source">
+            <legend>La vidéo *</legend>
+            <label class="temoi-radio"><input type="radio" name="temoi-source" value="fichier" checked> Téléverser un fichier vidéo</label>
+            <label class="temoi-radio"><input type="radio" name="temoi-source" value="youtube"> Coller un lien YouTube</label>
+          </fieldset>
+          <div id="temoi-bloc-fichier">
+            <input type="file" id="temoi-fichier" accept="video/mp4,video/webm,video/quicktime">
+            <p class="form-note">MP4, WebM ou MOV, 50 Mo maximum (environ 1 à 2 minutes filmées au téléphone). L'image de couverture est créée automatiquement à partir de la vidéo.</p>
+          </div>
+          <div id="temoi-bloc-youtube" hidden>
+            <input type="url" id="temoi-youtube" placeholder="https://youtu.be/...">
+            <p class="form-note">Astuce : publiez la vidéo sur YouTube en « Non répertoriée » ; elle sera visible uniquement sur le site.</p>
+          </div>
+          <label for="temoi-affiche">Image de couverture (facultatif)</label>
+          <input type="file" id="temoi-affiche" accept="image/jpeg,image/png,image/webp">
+          <p class="form-note">Pour choisir vous-même la photo affichée sur la carte, de préférence carrée.</p>
+
+          <p class="admin-succes" id="temoi-succes" hidden></p>
+          <button type="submit" class="btn btn-primary" id="btn-temoi">Ajouter le témoignage</button>
+        </form>
+      </div>
     </section>
 
     <!-- Mon compte : changement de mot de passe -->
