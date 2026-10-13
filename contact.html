@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — HANKA GROUP</title>
+<meta name="description" content="Contactez HANKA GROUP à Abidjan, Riviera 2 : téléphone, email ou formulaire de contact pour un devis gratuit.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <span class="logo-h">HANKA</span><span class="logo-group">GROUP</span>
+    </a>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="contact.html" aria-current="page">Contact</a></li>
+    </ul>
+    <a href="contact.html" class="nav-cta">Demander un devis</a>
+  </nav>
+</header>
+
+<main>
+
+  <section class="hero" style="padding-bottom:3rem;">
+    <div class="container" style="grid-template-columns:1fr; text-align:center;">
+      <div>
+        <p class="hero-eyebrow">Contact</p>
+        <h1>Parlons de votre projet</h1>
+        <p style="margin:0 auto;">Une question, un devis, un rendez-vous ? L'équipe HANKA GROUP vous répond rapidement.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="container contact-grid">
+
+      <div class="contact-info">
+        <div class="contact-item">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>
+            <h3>Téléphone</h3>
+            <p><a href="tel:+2250172976418">+225 01 72 97 64 18</a></p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></svg>
+          </div>
+          <div>
+            <h3>Email</h3>
+            <p><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div>
+            <h3>Adresse</h3>
+            <p>Abidjan, Riviera 2 — Côte d'Ivoire</p>
+          </div>
+        </div>
+
+        <div class="contact-item">
+          <div class="icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div>
+            <h3>Horaires</h3>
+            <p>[Horaires à confirmer] Lundi – Vendredi, 8h – 17h</p>
+          </div>
+        </div>
+      </div>
+
+      <form class="contact-form" aria-label="Formulaire de contact">
+        <div class="form-row">
+          <div>
+            <label for="nom">Nom complet *</label>
+            <input type="text" id="nom" name="nom" required>
+          </div>
+          <div>
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div>
+            <label for="telephone">Téléphone</label>
+            <input type="tel" id="telephone" name="telephone">
+          </div>
+          <div>
+            <label for="service">Service concerné</label>
+            <select id="service" name="service">
+              <option value="">Sélectionner...</option>
+              <option>Création d'entreprise</option>
+              <option>Formation marchés publics et privés</option>
+              <option>Formation certifiante</option>
+              <option>Procédures administratives</option>
+              <option>Immobilier</option>
+              <option>Communication digitale</option>
+              <option>Autre</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="message">Votre message *</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <p class="form-note">* Champs obligatoires. En soumettant ce formulaire, votre messagerie email s'ouvrira pour finaliser l'envoi.</p>
+        <button type="submit" class="btn btn-primary">Envoyer ma demande</button>
+      </form>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h3>HANKA GROUP</h3>
+        <p style="font-size:0.88rem; opacity:0.85; max-width:32ch;">[Texte à valider] Votre partenaire pour la création d'entreprise, la formation et le développement de votre activité à Abidjan.</p>
+      </div>
+      <div>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="tel:+2250172976418">+225 01 72 97 64 18</a></li>
+          <li><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></li>
+          <li>Abidjan, Riviera 2 — Côte d'Ivoire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="year"></span> HANKA GROUP. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>
