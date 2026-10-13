@@ -8,6 +8,57 @@ document.addEventListener("DOMContentLoaded", function () {
   var demandes = [];
   var filtre = "";
 
+  function nomsChangements(d) {
+    return (d.changements || []).map(function (c) {
+      return CHANGEMENTS_POSSIBLES[c] ? CHANGEMENTS_POSSIBLES[c].nom : c;
+    }).join(", ");
+  }
+
+  // Les deux types de demandes : colonnes propres à chacun (affichage et exports)
+  var TYPES = {
+    creation: {
+      table: "demandes_creation",
+      prefixe: "#",
+      titre: "Demandes de création d'entreprise",
+      fichier: "creations",
+      entetes: ["Forme", "Ville", "Pack", "Prix"],
+      cellules: function (d) {
+        return [
+          echapper(d.forme_juridique),
+          echapper(d.ville),
+          d.pack ? echapper(PACKS[d.pack].nom) : "—",
+          '<span class="nowrap">' + formaterFCFA(d.prix) + "</span>"
+        ];
+      },
+      colonnesExport: ["Forme juridique", "Ville", "Pack", "Prix (FCFA)"],
+      largeursExport: [22, 16, 16, 12],
+      valeursExport: function (d) {
+        return [d.forme_juridique, d.ville, d.pack ? PACKS[d.pack].nom : "", d.prix];
+      }
+    },
+    modification: {
+      table: "demandes_modification",
+      prefixe: "M",
+      titre: "Demandes de modification d'entreprise",
+      fichier: "modifications",
+      entetes: ["Forme actuelle", "À modifier", "Explication"],
+      cellules: function (d) {
+        return [
+          echapper(d.forme_actuelle),
+          echapper(nomsChangements(d)),
+          '<div class="cellule-texte">' + echapper(d.commentaire).replace(/\n/g, "<br>") + "</div>"
+        ];
+      },
+      colonnesExport: ["Forme actuelle", "À modifier", "Explication"],
+      largeursExport: [20, 28, 50],
+      valeursExport: function (d) {
+        return [d.forme_actuelle, nomsChangements(d), d.commentaire];
+      }
+    }
+  };
+  var typeCourant = "creation";
+  function type() { return TYPES[typeCourant]; }
+
   var vueConnexion = document.getElementById("vue-connexion");
   var vueDemandes = document.getElementById("vue-demandes");
   var btnDeconnexion = document.getElementById("btn-deconnexion");
@@ -98,10 +149,28 @@ document.addEventListener("DOMContentLoaded", function () {
   sb.auth.onAuthStateChange(function (_evt, session) { afficher(session); });
 
   // --- Chargement et affichage des demandes ---
+  // Nombre de nouvelles demandes de chaque type, affiché sur les boutons Créations / Modifications
+  function compterNouvelles() {
+    Object.keys(TYPES).forEach(function (cle) {
+      sb.from(TYPES[cle].table).select("id", { count: "exact", head: true }).eq("statut", "nouveau")
+        .then(function (r) {
+          var span = document.querySelector('[data-type="' + cle + '"] span');
+          if (span) span.textContent = r.count ? r.count + " nouvelle(s)" : "";
+        });
+    });
+  }
+
   function charger() {
     erreurDemandes.hidden = true;
-    sb.from("demandes_creation").select("*").order("created_at", { ascending: false })
+    document.getElementById("titre-demandes").textContent = type().titre;
+    document.querySelectorAll(".admin-types button").forEach(function (b) {
+      b.setAttribute("aria-selected", b.getAttribute("data-type") === typeCourant ? "true" : "false");
+    });
+    compterNouvelles();
+    var typeCharge = typeCourant;
+    sb.from(type().table).select("*").order("created_at", { ascending: false })
       .then(function (res) {
+        if (typeCharge !== typeCourant) return; // l'utilisateur a changé de type entre-temps
         if (res.error) {
           erreurDemandes.textContent = "Impossible de charger les demandes : " + res.error.message;
           erreurDemandes.hidden = false;
@@ -132,6 +201,10 @@ document.addEventListener("DOMContentLoaded", function () {
     var liste = demandes.filter(function (d) { return !filtre || d.statut === filtre; });
     document.getElementById("admin-vide").hidden = liste.length > 0;
 
+    document.getElementById("entete-demandes").innerHTML = "<tr>" +
+      ["N°", "Date", "Client", "Contact"].concat(type().entetes, ["Statut", "Note"])
+        .map(function (t) { return "<th>" + t + "</th>"; }).join("") + "</tr>";
+
     corps.innerHTML = liste.map(function (d) {
       var date = new Date(d.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
       var contact = [
@@ -142,14 +215,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return '<option value="' + s + '"' + (s === d.statut ? " selected" : "") + ">" + STATUTS[s] + "</option>";
       }).join("");
       return '<tr class="statut-' + d.statut + '">' +
-        "<td>#" + d.numero + "</td>" +
+        "<td>" + type().prefixe + d.numero + "</td>" +
         "<td>" + date + "</td>" +
         "<td><strong>" + echapper(d.prenom + " " + d.nom) + "</strong></td>" +
         "<td>" + contact + "</td>" +
-        "<td>" + echapper(d.forme_juridique) + "</td>" +
-        "<td>" + echapper(d.ville) + "</td>" +
-        "<td>" + (d.pack ? echapper(PACKS[d.pack].nom) : "—") + "</td>" +
-        '<td class="nowrap">' + formaterFCFA(d.prix) + "</td>" +
+        type().cellules(d).map(function (c) { return "<td>" + c + "</td>"; }).join("") +
         '<td><select data-statut="' + d.id + '" aria-label="Statut de la demande ' + d.numero + '">' + options + "</select></td>" +
         '<td><textarea data-note="' + d.id + '" rows="2" placeholder="Note interne...">' + echapper(d.note_admin || "") + "</textarea></td>" +
         "</tr>";
@@ -165,6 +235,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.getElementById("btn-actualiser").addEventListener("click", charger);
 
+  document.querySelector(".admin-types").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-type]");
+    if (!b || b.getAttribute("data-type") === typeCourant) return;
+    typeCourant = b.getAttribute("data-type");
+    filtre = "";
+    demandes = [];
+    rendre();
+    charger();
+  });
+
   // --- Export des demandes affichées (filtre en cours respecté) ---
   var LIBS = {
     xlsx: ["https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"],
@@ -173,7 +253,12 @@ document.addEventListener("DOMContentLoaded", function () {
       "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
     ]
   };
-  var COLONNES = ["N°", "Date", "Prénom", "Nom", "Téléphone", "Email", "Forme juridique", "Ville", "Pack", "Prix (FCFA)", "Statut", "Note"];
+  function colonnesExport() {
+    return ["N°", "Date", "Prénom", "Nom", "Téléphone", "Email"].concat(type().colonnesExport, ["Statut", "Note"]);
+  }
+  function largeursExport() {
+    return [6, 16, 14, 14, 16, 26].concat(type().largeursExport, [10, 30]);
+  }
 
   function chargerScripts(urls) {
     return urls.reduce(function (p, url) {
@@ -195,25 +280,22 @@ document.addEventListener("DOMContentLoaded", function () {
       .filter(function (d) { return !filtre || d.statut === filtre; })
       .map(function (d) {
         return [
-          d.numero,
+          type().prefixe + d.numero,
           new Date(d.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
           d.prenom,
           d.nom,
           d.telephone || "",
-          d.email || "",
-          d.forme_juridique,
-          d.ville,
-          d.pack ? PACKS[d.pack].nom : "",
-          d.prix,
+          d.email || ""
+        ].concat(type().valeursExport(d), [
           STATUTS[d.statut] || d.statut,
           d.note_admin || ""
-        ];
+        ]);
       });
   }
 
   function nomFichier(ext) {
     var jour = new Date().toISOString().slice(0, 10);
-    return "demandes-hanka" + (filtre ? "-" + filtre : "") + "-" + jour + "." + ext;
+    return "demandes-hanka-" + type().fichier + (filtre ? "-" + filtre : "") + "-" + jour + "." + ext;
   }
 
   function telecharger(blob, nom) {
@@ -232,13 +314,13 @@ document.addEventListener("DOMContentLoaded", function () {
         var s = String(v == null ? "" : v);
         return /[";\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
       };
-      var texte = [COLONNES].concat(lignes).map(function (l) { return l.map(cellule).join(";"); }).join("\r\n");
+      var texte = [colonnesExport()].concat(lignes).map(function (l) { return l.map(cellule).join(";"); }).join("\r\n");
       telecharger(new Blob(["﻿" + texte], { type: "text/csv;charset=utf-8" }), nomFichier("csv"));
     },
     xlsx: function (lignes) {
       return chargerScripts(LIBS.xlsx).then(function () {
-        var feuille = XLSX.utils.aoa_to_sheet([COLONNES].concat(lignes));
-        feuille["!cols"] = [6, 16, 14, 14, 16, 26, 22, 16, 16, 12, 10, 30].map(function (w) { return { wch: w }; });
+        var feuille = XLSX.utils.aoa_to_sheet([colonnesExport()].concat(lignes));
+        feuille["!cols"] = largeursExport().map(function (w) { return { wch: w }; });
         var classeur = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(classeur, feuille, "Demandes");
         XLSX.writeFile(classeur, nomFichier("xlsx"));
@@ -247,24 +329,26 @@ document.addEventListener("DOMContentLoaded", function () {
     pdf: function (lignes) {
       return chargerScripts(LIBS.pdf).then(function () {
         var doc = new window.jspdf.jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-        var total = lignes.reduce(function (s, l) { return s + l[9]; }, 0);
+        var colonnes = colonnesExport();
+        var iPrix = colonnes.indexOf("Prix (FCFA)");
+        var total = iPrix === -1 ? null : lignes.reduce(function (s, l) { return s + l[iPrix]; }, 0);
         doc.setFontSize(16);
-        doc.text("HANKA GROUP — Demandes de création d'entreprise", 40, 40);
+        doc.text("HANKA GROUP — " + type().titre, 40, 40);
         doc.setFontSize(9);
         doc.setTextColor(90);
         doc.text(
           "Export du " + new Date().toLocaleString("fr-FR") +
           " · Filtre : " + (filtre ? STATUTS[filtre] : "toutes") +
-          " · " + lignes.length + " demande(s) · Total : " + formaterFCFA(total),
+          " · " + lignes.length + " demande(s)" +
+          (total === null ? "" : " · Total : " + formaterFCFA(total)),
           40, 58
         );
         doc.autoTable({
           startY: 72,
-          head: [COLONNES],
+          head: [colonnes],
           body: lignes.map(function (l) {
             var copie = l.slice();
-            copie[0] = "#" + copie[0];
-            copie[9] = formaterFCFA(copie[9]);
+            if (iPrix !== -1) copie[iPrix] = formaterFCFA(copie[iPrix]);
             return copie;
           }),
           styles: { fontSize: 7, cellPadding: 3, overflow: "linebreak" },
@@ -299,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- Mise à jour du statut et de la note ---
   function enregistrer(id, champs, el) {
     el.disabled = true;
-    sb.from("demandes_creation").update(champs).eq("id", id).then(function (res) {
+    sb.from(type().table).update(champs).eq("id", id).then(function (res) {
       el.disabled = false;
       if (res.error) {
         erreurDemandes.textContent = "Modification non enregistrée : " + res.error.message;

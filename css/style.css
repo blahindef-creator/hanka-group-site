@@ -618,6 +618,29 @@ textarea { resize: vertical; min-height: 110px; }
   font-weight: 800;
 }
 
+/* Cases à cocher du parcours « Modifier mon entreprise » */
+.choix-list { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.75rem 0 1.5rem; }
+.choix-carte {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  margin: 0;
+  padding: 1rem 1.1rem;
+  border: 2px solid var(--gray-300);
+  border-radius: 10px;
+  background: var(--white);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.choix-carte:hover { border-color: var(--blue-light); }
+.choix-carte:has(input:checked) { border-color: var(--gold); background: #fff9e8; }
+.choix-carte input { width: 1.15rem; height: 1.15rem; margin-top: 0.15rem; flex-shrink: 0; accent-color: var(--blue); }
+.choix-texte { display: flex; flex-direction: column; gap: 0.2rem; }
+.choix-texte strong { font-size: 1rem; color: var(--blue-dark); }
+.choix-texte small { font-weight: 400; color: var(--gray-600); font-size: 0.82rem; }
+.label-espace { margin-top: 0.5rem; }
+.recap-devis { font-size: 1.05rem !important; }
+
 /* Récapitulatif */
 .recap { background: var(--gray-50); border: 1px solid var(--gray-100); border-radius: var(--radius); padding: 1.25rem 1.5rem; }
 .recap h3 { margin: 0 0 0.75rem; font-size: 1rem; color: var(--blue-dark); }
@@ -649,6 +672,7 @@ textarea { resize: vertical; min-height: 110px; }
 
 @media (max-width: 720px) {
   .pack-list { grid-template-columns: 1fr; }
+  .choix-list { grid-template-columns: 1fr; }
   .wizard-panel { padding: 1.25rem; }
   .forme-list { grid-template-columns: 1fr; }
 }
@@ -677,6 +701,20 @@ textarea { resize: vertical; min-height: 110px; }
 .admin-export { display: inline-flex; gap: 0.4rem; align-items: center; flex-wrap: wrap; }
 .admin-export-label { font-size: 0.85rem; font-weight: 700; color: var(--gray-600); }
 .admin-actions .btn { padding: 0.5rem 1rem; font-size: 0.85rem; }
+.admin-types { display: inline-flex; margin-top: 1.5rem; border: 2px solid var(--blue); border-radius: 10px; overflow: hidden; flex-wrap: wrap; }
+.admin-types button {
+  padding: 0.6rem 1.2rem;
+  border: 0;
+  background: var(--white);
+  color: var(--blue);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-types button[aria-selected="true"] { background: var(--blue); color: var(--white); }
+.admin-types span { font-size: 0.75rem; font-weight: 700; color: var(--gold-dark); margin-left: 0.3rem; }
+.admin-types button[aria-selected="true"] span { color: var(--gold); }
+.cellule-texte { max-width: 320px; white-space: normal; line-height: 1.45; }
 .admin-filtres { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1.5rem 0 1rem; }
 .admin-filtres button {
   padding: 0.45rem 0.9rem;

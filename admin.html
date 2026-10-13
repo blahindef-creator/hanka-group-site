@@ -55,7 +55,7 @@
     <section id="vue-demandes" hidden>
       <div class="admin-head">
         <div>
-          <h1>Demandes de création d'entreprise</h1>
+          <h1 id="titre-demandes">Demandes de création d'entreprise</h1>
           <p class="admin-sub" id="admin-compte"></p>
         </div>
         <div class="admin-actions">
@@ -67,6 +67,11 @@
             <button type="button" class="btn btn-ghost" data-export="pdf">PDF</button>
           </span>
         </div>
+      </div>
+
+      <div class="admin-types" role="tablist" aria-label="Type de demande">
+        <button type="button" data-type="creation" aria-selected="true">Créations <span></span></button>
+        <button type="button" data-type="modification" aria-selected="false">Modifications <span></span></button>
       </div>
 
       <div class="admin-filtres" role="tablist" aria-label="Filtrer par statut">
@@ -81,20 +86,7 @@
 
       <div class="admin-table-wrap">
         <table class="admin-table">
-          <thead>
-            <tr>
-              <th>N°</th>
-              <th>Date</th>
-              <th>Client</th>
-              <th>Contact</th>
-              <th>Forme</th>
-              <th>Ville</th>
-              <th>Pack</th>
-              <th>Prix</th>
-              <th>Statut</th>
-              <th>Note</th>
-            </tr>
-          </thead>
+          <thead id="entete-demandes"></thead>
           <tbody id="liste-demandes"></tbody>
         </table>
       </div>

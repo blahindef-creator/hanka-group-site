@@ -67,3 +67,12 @@ var PACKS = {
     ]
   }
 };
+
+// Éléments modifiables proposés dans le parcours « Modifier mon entreprise ».
+// ATTENTION : les codes (à gauche) doivent correspondre à la contrainte de la table demandes_modification.
+var CHANGEMENTS_POSSIBLES = {
+  forme_juridique: { nom: "Forme juridique", aide: "Ex. passer d'une Entreprise individuelle à une SARL" },
+  gerant: { nom: "Gérant", aide: "Nomination, remplacement ou départ du gérant" },
+  localisation: { nom: "Localisation", aide: "Transfert du siège social" },
+  statuts: { nom: "Statuts", aide: "Capital, objet social, nom, répartition des parts..." }
+};
