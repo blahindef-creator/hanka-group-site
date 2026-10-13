@@ -12,6 +12,44 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Diaporama du bloc d'accueil : une image toutes les 5 s, pause au survol
+  var slider = document.querySelector(".hero-slider");
+  if (slider) {
+    var slides = slider.querySelectorAll(".hero-slide");
+    var dotsBox = slider.querySelector(".hero-dots");
+    var current = 0;
+    var timer = null;
+
+    var show = function (index) {
+      slides[current].classList.remove("is-active");
+      dotsBox.children[current].setAttribute("aria-selected", "false");
+      current = (index + slides.length) % slides.length;
+      slides[current].classList.add("is-active");
+      dotsBox.children[current].setAttribute("aria-selected", "true");
+    };
+    var start = function () {
+      stop();
+      timer = setInterval(function () { show(current + 1); }, 5000);
+    };
+    var stop = function () {
+      if (timer) clearInterval(timer);
+    };
+
+    slides.forEach(function (slide, i) {
+      var dot = document.createElement("button");
+      dot.type = "button";
+      dot.setAttribute("role", "tab");
+      dot.setAttribute("aria-label", "Image " + (i + 1));
+      dot.setAttribute("aria-selected", i === 0 ? "true" : "false");
+      dot.addEventListener("click", function () { show(i); start(); });
+      dotsBox.appendChild(dot);
+    });
+
+    slider.addEventListener("mouseenter", stop);
+    slider.addEventListener("mouseleave", start);
+    start();
+  }
+
   var form = document.querySelector(".contact-form");
   if (form) {
     form.addEventListener("submit", function (event) {
