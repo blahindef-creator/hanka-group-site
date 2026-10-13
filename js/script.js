@@ -12,9 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Diaporama du bloc d'accueil : une image toutes les 5 s, pause au survol
-  var slider = document.querySelector(".hero-slider");
-  if (slider) {
+  // Diaporamas (accueil, services) : une image toutes les 5 s, pause au survol
+  document.querySelectorAll(".hero-slider").forEach(function (slider) {
     var slides = slider.querySelectorAll(".hero-slide");
     var dotsBox = slider.querySelector(".hero-dots");
     var current = 0;
@@ -48,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
     slider.addEventListener("mouseenter", stop);
     slider.addEventListener("mouseleave", start);
     start();
-  }
+  });
 
   var form = document.querySelector(".contact-form");
   if (form) {
