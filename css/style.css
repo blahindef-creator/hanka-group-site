@@ -1190,3 +1190,22 @@ main > section.bg-alt { background: var(--degrade-jaune-alt); }
 .chiffres { border-bottom-color: rgba(217, 158, 13, 0.25); }
 /* Les cartes restent blanches pour ressortir sur le fond jaune */
 .feature { background: var(--white); }
+
+/* --- Textes gris légèrement agrandis (meilleure lisibilité) --- */
+.section-head p { font-size: 1.05rem; }
+.service-card p, .contact-item p { font-size: 0.98rem; }
+.step p, .feature p { font-size: 0.96rem; }
+.placeholder-box { font-size: 0.96rem; }
+.form-note { font-size: 0.88rem; }
+.wizard-hint { font-size: 0.92rem; }
+.wizard-steps li { font-size: 0.88rem; }
+.choix-texte small { font-size: 0.88rem; }
+.recap dl { font-size: 0.98rem; }
+.done-ref { font-size: 0.96rem; }
+.admin-sub { font-size: 0.92rem; }
+.temoignage-infos, .temoi-admin-infos { font-size: 0.94rem; }
+.auth-intro { font-size: 0.98rem; }
+.auth-aide { font-size: 0.92rem; }
+.espace-statut-aide { font-size: 0.96rem; }
+.espace-details dt { font-size: 0.84rem; }
+.espace-docs li small { font-size: 0.85rem; }
