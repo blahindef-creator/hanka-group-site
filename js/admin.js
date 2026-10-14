@@ -54,6 +54,26 @@ document.addEventListener("DOMContentLoaded", function () {
       valeursExport: function (d) {
         return [d.forme_actuelle, nomsChangements(d), d.commentaire];
       }
+    },
+    contact: {
+      table: "messages_contact",
+      prefixe: "C",
+      titre: "Messages du formulaire de contact",
+      fichier: "messages",
+      sansDocuments: true,
+      entetes: ["Service", "Message"],
+      cellules: function (d) {
+        return [
+          echapper(d.service || "—"),
+          '<div class="cellule-texte">' + echapper(d.message).replace(/
+/g, "<br>") + "</div>"
+        ];
+      },
+      colonnesExport: ["Service", "Message"],
+      largeursExport: [22, 60],
+      valeursExport: function (d) {
+        return [d.service || "", d.message];
+      }
     }
   };
   var typeCourant = "creation";
@@ -204,6 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var documentsParDemande = {};
   function chargerDocuments(typeCharge) {
     documentsParDemande = {};
+    if (TYPES[typeCharge].sansDocuments) return;
     var ids = demandes.map(function (d) { return d.id; });
     if (!ids.length) return;
     sb.from("documents").select("id, demande_id, nom_fichier, chemin, taille")
@@ -269,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
       return '<tr class="statut-' + d.statut + '">' +
         "<td>" + type().prefixe + d.numero + "</td>" +
         "<td>" + date + "</td>" +
-        "<td><strong>" + echapper(d.prenom + " " + d.nom) + "</strong></td>" +
+        "<td><strong>" + echapper([d.prenom, d.nom].filter(Boolean).join(" ")) + "</strong></td>" +
         "<td>" + contact + "</td>" +
         "<td>" + celluleDocuments(d) + "</td>" +
         type().cellules(d).map(function (c) { return "<td>" + c + "</td>"; }).join("") +
@@ -335,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return [
           type().prefixe + d.numero,
           new Date(d.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }),
-          d.prenom,
+          d.prenom || "",
           d.nom,
           d.telephone || "",
           d.email || ""

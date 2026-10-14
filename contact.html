@@ -7,7 +7,7 @@
 <meta name="description" content="Contactez HANKA GROUP à Abidjan, Riviera 2 : téléphone, email ou formulaire de contact pour un devis gratuit.">
 <link rel="icon" href="assets/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="stylesheet" href="css/style.css?v=202610141426">
+<link rel="stylesheet" href="css/style.css?v=202610141437">
 </head>
 <body>
 
@@ -126,9 +126,20 @@
           <label for="message">Votre message *</label>
           <textarea id="message" name="message" required></textarea>
         </div>
-        <p class="form-note">* Champs obligatoires. En soumettant ce formulaire, votre messagerie email s'ouvrira pour finaliser l'envoi.</p>
+        <div class="hp" aria-hidden="true">
+          <label for="site_web">Ne pas remplir</label>
+          <input type="text" id="site_web" name="site_web" tabindex="-1" autocomplete="off">
+        </div>
+        <p class="form-note">* Champs obligatoires. Votre message est transmis directement à l'équipe HANKA GROUP.</p>
+        <p class="wizard-error" id="contact-erreur" hidden></p>
         <button type="submit" class="btn btn-primary">Envoyer ma demande</button>
       </form>
+      <div class="contact-merci" id="contact-merci" hidden tabindex="-1">
+        <div class="done-icon" aria-hidden="true">✓</div>
+        <h3>Message envoyé.</h3>
+        <p>Merci ! L'équipe HANKA GROUP vous répond dans les plus brefs délais.</p>
+        <p class="done-ref" id="contact-ref"></p>
+      </div>
 
     </div>
   </section>
@@ -167,7 +178,8 @@
   </div>
 </footer>
 
-<script src="js/script.js?v=202610141426"></script>
+<script src="js/script.js?v=202610141437"></script>
+<script src="js/config.js?v=202610141437"></script>
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>

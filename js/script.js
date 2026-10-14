@@ -63,22 +63,55 @@ document.addEventListener("DOMContentLoaded", function () {
   };
   document.querySelectorAll(".hero-slider").forEach(window.hankaDiaporama);
 
+  // Formulaire de contact : le message est enregistré pour l'espace admin (onglet Demandes > Messages)
   var form = document.querySelector(".contact-form");
   if (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      var name = form.querySelector("#nom").value.trim();
-      var email = form.querySelector("#email").value.trim();
-      var message = form.querySelector("#message").value.trim();
+      var val = function (id) { return form.querySelector("#" + id).value.trim(); };
+      var erreur = document.getElementById("contact-erreur");
+      var montrer = function (m) { erreur.textContent = m || ""; erreur.hidden = !m; };
 
-      if (!name || !email || !message) {
-        alert("Merci de remplir au moins votre nom, votre email et votre message.");
-        return;
-      }
+      if (!val("nom") || !val("email") || !val("message")) return montrer("Merci de remplir votre nom, votre email et votre message.");
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val("email"))) return montrer("L'adresse email n'est pas valide.");
+      if (val("telephone") && !/^\+?[0-9 ]{8,20}$/.test(val("telephone"))) return montrer("Le numéro de téléphone n'est pas valide (chiffres uniquement).");
+      if (typeof HANKA_CONFIG === "undefined") return montrer("Envoi impossible pour le moment. Appelez-nous au +225 01 72 97 64 18.");
+      montrer("");
 
-      var subject = encodeURIComponent("Demande via le site — " + name);
-      var body = encodeURIComponent(message + "\n\nEmail : " + email);
-      window.location.href = "mailto:hanekatehe@gmail.com?subject=" + subject + "&body=" + body;
+      var bouton = form.querySelector("button[type=submit]");
+      bouton.disabled = true;
+      bouton.textContent = "Envoi en cours...";
+      fetch(HANKA_CONFIG.supabaseUrl + "/functions/v1/creer-demande", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "apikey": HANKA_CONFIG.supabaseAnonKey,
+          "Authorization": "Bearer " + HANKA_CONFIG.supabaseAnonKey
+        },
+        body: JSON.stringify({
+          type: "contact",
+          nom: val("nom"),
+          email: val("email"),
+          telephone: val("telephone") || null,
+          service: val("service") || null,
+          message: val("message"),
+          site_web: val("site_web")
+        })
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          if (!res.ok || !res.d.ok) throw new Error();
+          form.hidden = true;
+          var merci = document.getElementById("contact-merci");
+          if (res.d.numero) document.getElementById("contact-ref").textContent = "Référence de votre message : C" + res.d.numero;
+          merci.hidden = false;
+          merci.focus();
+        })
+        .catch(function () {
+          montrer("L'envoi n'a pas abouti. Vérifiez votre connexion et réessayez, ou appelez-nous au +225 01 72 97 64 18.");
+          bouton.disabled = false;
+          bouton.textContent = "Envoyer ma demande";
+        });
     });
   }
 });
