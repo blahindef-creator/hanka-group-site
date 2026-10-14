@@ -45,6 +45,8 @@
       <button type="button" data-onglet="demandes" aria-current="page">Demandes</button>
       <button type="button" data-onglet="formations">Formations</button>
       <button type="button" data-onglet="temoignages">Témoignages</button>
+      <button type="button" data-onglet="visuels">Visuels</button>
+      <button type="button" data-onglet="publicites">Publicités</button>
       <button type="button" data-onglet="compte">Mon compte</button>
       <button type="button" data-onglet="collaborateurs" id="onglet-collaborateurs" hidden>Collaborateurs</button>
     </nav>
@@ -196,6 +198,63 @@
       </div>
     </section>
 
+    <!-- Photos du site remplaçables -->
+    <section id="vue-visuels" hidden>
+      <div class="admin-carte admin-carte-large">
+        <h1>Photos du site</h1>
+        <p class="admin-sub">Remplacez n'importe quelle photo du site par la vôtre (JPG, PNG ou WebP, 5 Mo maximum). Le changement est visible immédiatement. Le format conseillé est indiqué sous chaque photo.</p>
+        <p class="wizard-error" id="visuels-erreur" hidden></p>
+        <p class="admin-succes" id="visuels-succes" hidden></p>
+        <div class="visuels-grille" id="visuels-grille"></div>
+      </div>
+    </section>
+
+    <!-- Publicités / placements de produits (accueil, section « À la une ») -->
+    <section id="vue-publicites" hidden>
+      <div class="admin-carte admin-carte-large">
+        <h1>Publicités</h1>
+        <p class="admin-sub">Visuels publicitaires et placements de produits affichés sur l'accueil, dans la section « À la une ». La section n'apparaît que lorsqu'au moins une publicité est publiée et en cours de diffusion.</p>
+
+        <p class="wizard-error" id="pubs-erreur" hidden></p>
+        <ul class="temoi-admin-liste" id="pubs-admin-liste"></ul>
+        <p class="admin-vide" id="pubs-admin-vide" hidden>Aucune publicité pour le moment.</p>
+
+        <form id="form-pub" class="admin-form admin-form-large">
+          <h2>Ajouter une publicité</h2>
+          <label for="pub-image">Visuel publicitaire *</label>
+          <input type="file" id="pub-image" accept="image/jpeg,image/png,image/webp" required>
+          <p class="form-note">Format conseillé : paysage 16:9, par exemple 1200 × 675 pixels. JPG, PNG ou WebP, 5 Mo maximum.</p>
+          <label for="pub-titre">Titre</label>
+          <input type="text" id="pub-titre" maxlength="120" placeholder="Ex. -20 % sur la création de SARL ce mois-ci">
+          <label for="pub-texte">Texte</label>
+          <textarea id="pub-texte" maxlength="400" rows="3" placeholder="Quelques mots sur l'offre ou le partenaire (facultatif)"></textarea>
+          <div class="form-row">
+            <div>
+              <label for="pub-lien">Lien (facultatif)</label>
+              <input type="url" id="pub-lien" placeholder="https://...">
+            </div>
+            <div>
+              <label for="pub-bouton">Texte du bouton</label>
+              <input type="text" id="pub-bouton" maxlength="40" placeholder="Ex. Découvrir l'offre">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="pub-debut">Diffuser à partir du</label>
+              <input type="date" id="pub-debut">
+            </div>
+            <div>
+              <label for="pub-fin">Jusqu'au (inclus)</label>
+              <input type="date" id="pub-fin">
+            </div>
+          </div>
+          <p class="form-note">Sans dates, la publicité reste affichée jusqu'à ce que vous la masquiez. Un lien WhatsApp (https://wa.me/...) fonctionne aussi.</p>
+          <p class="admin-succes" id="pub-succes" hidden></p>
+          <button type="submit" class="btn btn-primary" id="btn-pub">Publier la publicité</button>
+        </form>
+      </div>
+    </section>
+
     <!-- Mon compte : changement de mot de passe -->
     <section id="vue-compte" hidden>
       <div class="admin-carte">
@@ -262,6 +321,7 @@
 <script src="js/config.js"></script>
 <script src="js/data/creation-entreprise.js"></script>
 <script src="js/tarifs.js"></script>
+<script src="js/data/visuels.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>

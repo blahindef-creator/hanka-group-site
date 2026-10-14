@@ -75,6 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var vues = {
     demandes: vueDemandes,
     formations: document.getElementById("vue-formations"),
+    visuels: document.getElementById("vue-visuels"),
+    publicites: document.getElementById("vue-publicites"),
     temoignages: document.getElementById("vue-temoignages"),
     compte: document.getElementById("vue-compte"),
     collaborateurs: document.getElementById("vue-collaborateurs")
@@ -91,6 +93,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (nom === "collaborateurs") chargerAdmins();
     if (nom === "temoignages") chargerTemoignages();
     if (nom === "formations") chargerSessions();
+    if (nom === "visuels") chargerVisuels();
+    if (nom === "publicites") chargerPubs();
   }
 
   onglets.addEventListener("click", function (e) {
@@ -935,6 +939,255 @@ document.addEventListener("DOMContentLoaded", function () {
       succes.textContent = modification ? "Session modifiée." : "Session publiée : elle apparaît sur la page Services.";
       succes.hidden = false;
       chargerSessions();
+    });
+  });
+
+  // --- Images téléversées par les admins (stockage public « medias ») ---
+  var TYPES_IMAGES = ["image/jpeg", "image/png", "image/webp"];
+  var TAILLE_MAX_IMAGE = 5 * 1024 * 1024;
+
+  function verifierImage(fichier) {
+    if (TYPES_IMAGES.indexOf(fichier.type) === -1) return "Format non accepté : utilisez une image JPG, PNG ou WebP.";
+    if (fichier.size > TAILLE_MAX_IMAGE) return "L'image fait " + (fichier.size / 1048576).toFixed(1).replace(".", ",") + " Mo : le maximum est 5 Mo.";
+    return "";
+  }
+
+  function televerserMedia(fichier, prefixe) {
+    var ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[fichier.type];
+    var chemin = prefixe + "-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8) + "." + ext;
+    return sb.storage.from("medias").upload(chemin, fichier, { contentType: fichier.type }).then(function (r) {
+      if (r.error) throw new Error(r.error.message);
+      return sb.storage.from("medias").getPublicUrl(chemin).data.publicUrl;
+    });
+  }
+
+  // Supprime du stockage une image qui n'est plus utilisée (seulement si elle vient de « medias »)
+  function supprimerMedia(url) {
+    var repere = "/storage/v1/object/public/medias/";
+    var i = String(url || "").indexOf(repere);
+    if (i !== -1) sb.storage.from("medias").remove([decodeURIComponent(url.slice(i + repere.length))]);
+  }
+
+  // --- Onglet Visuels : remplacer les photos du site ---
+  var remplacements = {};
+  var grilleVisuels = document.getElementById("visuels-grille");
+
+  function messageVisuels(erreur, succes) {
+    var e = document.getElementById("visuels-erreur"), s = document.getElementById("visuels-succes");
+    e.textContent = erreur || ""; e.hidden = !erreur;
+    s.textContent = succes || ""; s.hidden = !succes;
+  }
+
+  function chargerVisuels() {
+    sb.from("visuels").select("cle, url").then(function (res) {
+      if (res.error) return messageVisuels("Impossible de charger les photos : " + res.error.message);
+      remplacements = {};
+      res.data.forEach(function (l) { remplacements[l.cle] = l.url; });
+      rendreVisuels();
+    });
+  }
+
+  function rendreVisuels() {
+    var pages = [];
+    EMPLACEMENTS_VISUELS.forEach(function (v) { if (pages.indexOf(v.page) === -1) pages.push(v.page); });
+    grilleVisuels.innerHTML = pages.map(function (page) {
+      return "<h2 class=\"visuels-page\">" + echapper(page) + "</h2><div class=\"visuels-liste\">" +
+        EMPLACEMENTS_VISUELS.filter(function (v) { return v.page === page; }).map(function (v) {
+          var perso = remplacements[v.cle];
+          return '<div class="visuel-carte' + (perso ? " visuel-perso" : "") + '">' +
+            '<div class="visuel-apercu"><img src="' + echapper(perso || v.defaut) + '" alt="" loading="lazy">' +
+              (perso ? '<span class="visuel-badge">Personnalisée</span>' : "") + "</div>" +
+            '<div class="visuel-infos"><strong>' + echapper(v.nom) + "</strong><span>Format conseillé : " + echapper(v.format) + "</span></div>" +
+            '<div class="visuel-actions">' +
+              '<label class="btn btn-primary btn-petit visuel-remplacer">Remplacer' +
+                '<input type="file" accept="image/jpeg,image/png,image/webp" data-visuel-fichier="' + v.cle + '"></label>' +
+              (perso ? '<button type="button" class="btn btn-ghost btn-petit" data-visuel-origine="' + v.cle + '">Image d\'origine</button>' : "") +
+            "</div>" +
+          "</div>";
+        }).join("") + "</div>";
+    }).join("");
+  }
+
+  grilleVisuels.addEventListener("change", function (e) {
+    var champ = e.target.closest("[data-visuel-fichier]");
+    if (!champ || !champ.files[0]) return;
+    var cle = champ.getAttribute("data-visuel-fichier");
+    var fichier = champ.files[0];
+    var probleme = verifierImage(fichier);
+    if (probleme) { champ.value = ""; return messageVisuels(probleme); }
+
+    messageVisuels("", "Envoi de l'image en cours...");
+    champ.disabled = true;
+    var ancienne = remplacements[cle];
+    televerserMedia(fichier, "visuel-" + cle).then(function (url) {
+      return sb.from("visuels").upsert({ cle: cle, url: url, updated_at: new Date().toISOString() }).then(function (r) {
+        if (r.error) { supprimerMedia(url); throw new Error(r.error.message); }
+      });
+    }).then(function () {
+      if (ancienne) supprimerMedia(ancienne);
+      messageVisuels("", "Photo remplacée : elle est visible sur le site.");
+      chargerVisuels();
+    }).catch(function (err) {
+      messageVisuels("Remplacement impossible : " + err.message);
+      champ.disabled = false;
+    });
+  });
+
+  grilleVisuels.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-visuel-origine]");
+    if (!b) return;
+    var cle = b.getAttribute("data-visuel-origine");
+    if (b.getAttribute("data-confirmer") !== "1") {
+      b.setAttribute("data-confirmer", "1");
+      b.textContent = "Confirmer ?";
+      b.classList.add("btn-danger");
+      return;
+    }
+    b.disabled = true;
+    var ancienne = remplacements[cle];
+    sb.from("visuels").delete().eq("cle", cle).then(function (r) {
+      if (r.error) { b.disabled = false; return messageVisuels("Impossible : " + r.error.message); }
+      supprimerMedia(ancienne);
+      messageVisuels("", "L'image d'origine est de nouveau affichée.");
+      chargerVisuels();
+    });
+  });
+
+  // --- Onglet Publicités ---
+  var pubs = [];
+  var listePubs = document.getElementById("pubs-admin-liste");
+
+  function erreurPubs(message) {
+    var e = document.getElementById("pubs-erreur");
+    e.textContent = message || "";
+    e.hidden = !message;
+  }
+
+  function chargerPubs() {
+    erreurPubs("");
+    sb.from("publicites").select("*").order("ordre").order("created_at").then(function (res) {
+      if (res.error) return erreurPubs("Impossible de charger les publicités : " + res.error.message);
+      pubs = res.data || [];
+      rendrePubs();
+    });
+  }
+
+  function periodePub(p) {
+    var f = function (d) { return new Date(d + "T12:00:00").toLocaleDateString("fr-FR"); };
+    if (p.date_debut && p.date_fin) return "Du " + f(p.date_debut) + " au " + f(p.date_fin);
+    if (p.date_debut) return "À partir du " + f(p.date_debut);
+    if (p.date_fin) return "Jusqu'au " + f(p.date_fin);
+    return "Sans limite de dates";
+  }
+
+  function etatPub(p) {
+    var j = new Date().toISOString().slice(0, 10);
+    if (!p.publie) return "○ Masquée";
+    if (p.date_fin && p.date_fin < j) return "○ Terminée";
+    if (p.date_debut && p.date_debut > j) return "◔ Programmée";
+    return "● En ligne sur l'accueil";
+  }
+
+  function rendrePubs() {
+    document.getElementById("pubs-admin-vide").hidden = pubs.length > 0;
+    listePubs.innerHTML = pubs.map(function (p, i) {
+      var enLigne = etatPub(p).indexOf("En ligne") !== -1;
+      return '<li class="temoi-admin' + (enLigne ? "" : " temoi-masque") + '">' +
+        '<a class="temoi-admin-image pub-admin-image" href="' + echapper(p.image_url) + '" target="_blank" rel="noopener"><img src="' + echapper(p.image_url) + '" alt=""></a>' +
+        '<div class="temoi-admin-infos"><strong>' + echapper(p.titre || "(sans titre)") + "</strong>" +
+          (p.lien_url ? "<span>🔗 " + echapper(p.lien_url) + "</span>" : "") +
+          "<span>" + periodePub(p) + "</span>" +
+          '<span class="temoi-etat">' + etatPub(p) + "</span></div>" +
+        '<div class="temoi-admin-actions">' +
+          '<button type="button" class="btn btn-ghost btn-petit" data-pub-monter="' + i + '"' + (i === 0 ? " disabled" : "") + ' aria-label="Monter">↑</button>' +
+          '<button type="button" class="btn btn-ghost btn-petit" data-pub-descendre="' + i + '"' + (i === pubs.length - 1 ? " disabled" : "") + ' aria-label="Descendre">↓</button>' +
+          '<button type="button" class="btn btn-ghost btn-petit" data-pub-publier="' + i + '">' + (p.publie ? "Masquer" : "Publier") + "</button>" +
+          '<button type="button" class="btn btn-ghost btn-petit" data-pub-supprimer="' + i + '">Supprimer</button>' +
+        "</div></li>";
+    }).join("");
+  }
+
+  listePubs.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    if (b.hasAttribute("data-pub-monter") || b.hasAttribute("data-pub-descendre")) {
+      var i = Number(b.getAttribute("data-pub-monter") || b.getAttribute("data-pub-descendre"));
+      var j = b.hasAttribute("data-pub-monter") ? i - 1 : i + 1;
+      pubs.splice(j, 0, pubs.splice(i, 1)[0]);
+      rendrePubs();
+      Promise.all(pubs.map(function (p, k) { return sb.from("publicites").update({ ordre: k }).eq("id", p.id); }))
+        .then(function (res) {
+          var err = res.filter(function (r) { return r.error; })[0];
+          if (err) erreurPubs("Ordre non enregistré : " + err.error.message);
+        });
+      return;
+    }
+    if (b.hasAttribute("data-pub-publier")) {
+      var p = pubs[Number(b.getAttribute("data-pub-publier"))];
+      b.disabled = true;
+      sb.from("publicites").update({ publie: !p.publie }).eq("id", p.id).then(function (r) {
+        if (r.error) { b.disabled = false; return erreurPubs("Modification impossible : " + r.error.message); }
+        chargerPubs();
+      });
+      return;
+    }
+    if (b.hasAttribute("data-pub-supprimer")) {
+      if (b.getAttribute("data-confirmer") !== "1") {
+        b.setAttribute("data-confirmer", "1");
+        b.textContent = "Confirmer la suppression ?";
+        b.classList.add("btn-danger");
+        return;
+      }
+      var cible = pubs[Number(b.getAttribute("data-pub-supprimer"))];
+      b.disabled = true;
+      sb.from("publicites").delete().eq("id", cible.id).then(function (r) {
+        if (r.error) { b.disabled = false; return erreurPubs("Suppression impossible : " + r.error.message); }
+        supprimerMedia(cible.image_url);
+        chargerPubs();
+      });
+    }
+  });
+
+  document.getElementById("form-pub").addEventListener("submit", function (e) {
+    e.preventDefault();
+    erreurPubs("");
+    var succes = document.getElementById("pub-succes");
+    succes.hidden = true;
+    var val = function (id) { return document.getElementById(id).value.trim(); };
+    var fichier = document.getElementById("pub-image").files[0];
+    if (!fichier) return erreurPubs("Choisissez le visuel publicitaire.");
+    var probleme = verifierImage(fichier);
+    if (probleme) return erreurPubs(probleme);
+    if (val("pub-lien") && !/^https:\/\//i.test(val("pub-lien"))) return erreurPubs("Le lien doit commencer par https://");
+    if (val("pub-debut") && val("pub-fin") && val("pub-fin") < val("pub-debut")) return erreurPubs("La date de fin doit être après la date de début.");
+
+    var bouton = document.getElementById("btn-pub");
+    bouton.disabled = true;
+    bouton.textContent = "Envoi du visuel...";
+    televerserMedia(fichier, "pub").then(function (url) {
+      return sb.from("publicites").insert({
+        image_url: url,
+        titre: val("pub-titre") || null,
+        texte: val("pub-texte") || null,
+        lien_url: val("pub-lien") || null,
+        libelle_bouton: val("pub-bouton") || null,
+        date_debut: val("pub-debut") || null,
+        date_fin: val("pub-fin") || null,
+        ordre: pubs.length,
+        publie: true
+      }).then(function (r) {
+        if (r.error) { supprimerMedia(url); throw new Error(r.error.message); }
+      });
+    }).then(function () {
+      e.target.reset();
+      succes.textContent = "Publicité ajoutée.";
+      succes.hidden = false;
+      chargerPubs();
+    }).catch(function (err) {
+      erreurPubs("Ajout impossible : " + err.message);
+    }).then(function () {
+      bouton.disabled = false;
+      bouton.textContent = "Publier la publicité";
     });
   });
 });

@@ -1315,3 +1315,56 @@ main > section.bg-alt { background: var(--degrade-jaune-alt); }
 
 /* Diaporamas plus dynamiques : fondu plus court */
 .hero-slide { transition: opacity 0.6s ease; }
+
+/* --- Espace publicitaire « À la une » (accueil) --- */
+.pubs-head { text-align: center; margin-bottom: 1.75rem; }
+.pubs-head h2 { margin: 0.4rem 0 0; font-size: clamp(1.5rem, 3vw, 2.1rem); color: var(--blue-dark); }
+.pubs-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+.pubs-grille.pubs-une-seule { max-width: 900px; margin: 0 auto; grid-template-columns: 1fr; }
+.pub {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 2px solid rgba(245, 185, 33, 0.55);
+}
+.pub-image { display: block; aspect-ratio: 16 / 9; overflow: hidden; background: var(--gray-100); }
+.pub-image img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s; }
+a.pub-image:hover img { transform: scale(1.03); }
+.pub-texte { display: flex; flex-direction: column; gap: 0.5rem; padding: 1.1rem 1.25rem 1.3rem; }
+.pub-texte h3 { margin: 0; color: var(--blue-dark); font-size: 1.15rem; }
+.pub-texte p { margin: 0; color: var(--gray-600); font-size: 0.95rem; }
+.pub-texte .btn { align-self: flex-start; margin-top: 0.35rem; }
+.pub-mention {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(6, 27, 74, 0.75);
+  color: var(--white);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* --- Espace admin : photos du site --- */
+.visuels-page { margin: 1.75rem 0 0.75rem; font-size: 1.1rem; color: var(--blue-dark); }
+.visuels-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1rem; }
+.visuel-carte { display: flex; flex-direction: column; border: 1px solid var(--gray-100); border-radius: 10px; overflow: hidden; background: var(--gray-50); }
+.visuel-perso { border-color: var(--gold); }
+.visuel-apercu { position: relative; aspect-ratio: 4 / 3; background: var(--gray-100); }
+.visuel-apercu img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.visuel-badge { position: absolute; top: 0.4rem; left: 0.4rem; padding: 0.1rem 0.5rem; border-radius: 999px; background: var(--gold); color: var(--blue-dark); font-size: 0.7rem; font-weight: 800; }
+.visuel-infos { display: flex; flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.7rem 0.3rem; font-size: 0.82rem; color: var(--gray-600); }
+.visuel-infos strong { color: var(--blue-dark); font-size: 0.9rem; }
+.visuel-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.5rem 0.7rem 0.75rem; }
+.visuel-remplacer { position: relative; overflow: hidden; margin: 0; cursor: pointer; }
+.visuel-remplacer input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.pub-admin-image { width: 128px; height: 72px; }
+@media (max-width: 640px) { .pub-admin-image { width: 96px; height: 54px; } }
+.temoi-admin:has(.pub-admin-image) { grid-template-columns: 128px 1fr auto; }
+@media (max-width: 640px) { .temoi-admin:has(.pub-admin-image) { grid-template-columns: 96px 1fr; } }
