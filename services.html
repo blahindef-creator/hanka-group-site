@@ -37,15 +37,46 @@
 
 <main>
 
-  <section class="hero" style="padding-bottom:3rem;">
-    <div class="container" style="grid-template-columns:1fr; text-align:center;">
-      <div>
-        <p class="hero-eyebrow">Nos services</p>
-        <h1>Six domaines d'intervention pour votre entreprise</h1>
-        <p style="margin:0 auto;">Des solutions concrètes pour créer, faire évoluer et développer votre activité en Côte d'Ivoire.</p>
+  <section class="hero hero-v3 hero-v3-page">
+    <!-- Photos qui défilent à droite, fondues dans le dégradé (modifiables dans l'admin : onglet Visuels) -->
+    <div class="hero-slider hero-v3-photos" aria-roledescription="carrousel" aria-label="Nos services en images">
+      <div class="hero-slide is-active">
+        <img data-visuel="services-haut-1" src="assets/services/communication-reseaux.jpg" alt="Smartphone connecté aux réseaux sociaux">
+      </div>
+      <div class="hero-slide">
+        <img data-visuel="services-haut-2" src="assets/services/immobilier-maquette.jpg" alt="Maquette de maison et graphiques du marché immobilier">
+      </div>
+      <div class="hero-slide">
+        <img data-visuel="services-haut-3" src="assets/services/modification-croissance.jpg" alt="Équipe analysant la croissance d'une entreprise">
+      </div>
+      <div class="hero-slide">
+        <img data-visuel="services-haut-4" src="assets/hero/services-dossiers.jpg" alt="Pile de dossiers administratifs">
+      </div>
+      <div class="hero-slide">
+        <img data-visuel="services-haut-5" src="assets/services/creation-entreprise.jpg" alt="Poignée de main entre une entrepreneure et un partenaire">
+      </div>
+      <div class="hero-dots" role="tablist" aria-label="Choisir une image"></div>
+    </div>
+    <img class="hero-v3-logo" src="assets/logo-hanka-group.png" alt="HANKA GROUP — Innover, Construire, Valoriser">
+
+    <div class="container hero-v3-contenu">
+      <div class="hero-v3-texte">
+        <p class="hero-v3-lieu">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+          Nos services
+        </p>
+        <h1>Six domaines d'intervention pour <span>votre entreprise</span></h1>
+        <p>Des solutions concrètes pour créer, faire évoluer et développer votre activité en Côte d'Ivoire.</p>
+        <a href="#creation" class="hero-v3-bouton">
+          Découvrir nos services
+          <span aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+          </span>
+        </a>
       </div>
     </div>
   </section>
+
 
   <section id="creation">
     <div class="container about-grid">
@@ -270,6 +301,7 @@
 <script src="js/config.js"></script>
 <script src="js/reservation.js"></script>
 <script src="js/galeries.js"></script>
+<script src="js/visuels.js"></script>
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>
