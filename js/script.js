@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Diaporamas (accueil, services) : une image toutes les 5 s, pause au survol
+  // Diaporamas (accueil, services) : une image toutes les 3 s, pause au survol
   document.querySelectorAll(".hero-slider").forEach(function (slider) {
     var slides = slider.querySelectorAll(".hero-slide");
     var dotsBox = slider.querySelector(".hero-dots");
@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     var start = function () {
       stop();
-      timer = setInterval(function () { show(current + 1); }, 5000);
+      timer = setInterval(function () { show(current + 1); }, 3000);
     };
     var stop = function () {
       if (timer) clearInterval(timer);
