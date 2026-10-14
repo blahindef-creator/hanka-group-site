@@ -43,6 +43,7 @@
     <!-- Navigation de l'espace admin -->
     <nav class="admin-onglets" id="admin-onglets" aria-label="Espace admin" hidden>
       <button type="button" data-onglet="demandes" aria-current="page">Demandes</button>
+      <button type="button" data-onglet="formations">Formations</button>
       <button type="button" data-onglet="temoignages">Témoignages</button>
       <button type="button" data-onglet="compte">Mon compte</button>
       <button type="button" data-onglet="collaborateurs" id="onglet-collaborateurs" hidden>Collaborateurs</button>
@@ -92,6 +93,51 @@
         </table>
       </div>
       <p class="admin-vide" id="admin-vide" hidden>Aucune demande pour ce filtre.</p>
+    </section>
+
+    <!-- Dates des sessions de la formation certifiante (page Services) -->
+    <section id="vue-formations" hidden>
+      <div class="admin-carte admin-carte-large">
+        <h1>Sessions de formation</h1>
+        <p class="admin-sub">Formation certifiante en marchés publics. Les sessions publiées et à venir s'affichent sur la page Services, avec un bouton de réservation WhatsApp.</p>
+
+        <p class="wizard-error" id="form-erreur" hidden></p>
+        <ul class="temoi-admin-liste" id="sessions-admin-liste"></ul>
+        <p class="admin-vide" id="sessions-admin-vide" hidden>Aucune session pour le moment. Ajoutez la prochaine date ci-dessous.</p>
+
+        <form id="form-session" class="admin-form admin-form-large">
+          <h2 id="titre-form-session">Ajouter une session</h2>
+          <div class="form-row">
+            <div>
+              <label for="session-debut">Date de début *</label>
+              <input type="date" id="session-debut" required>
+            </div>
+            <div>
+              <label for="session-fin">Date de fin (si plusieurs jours)</label>
+              <input type="date" id="session-fin">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="session-horaires">Horaires</label>
+              <input type="text" id="session-horaires" maxlength="100" placeholder="Ex. 9h – 16h">
+            </div>
+            <div>
+              <label for="session-places">Nombre de places</label>
+              <input type="number" id="session-places" min="1" max="1000" placeholder="Ex. 30">
+            </div>
+          </div>
+          <label for="session-lieu">Lieu</label>
+          <input type="text" id="session-lieu" maxlength="150" placeholder="Ex. Abidjan, Riviera 2 — ou « En ligne »">
+          <label for="session-note">Information complémentaire</label>
+          <input type="text" id="session-note" maxlength="300" placeholder="Ex. Pause-déjeuner offerte, apporter un ordinateur">
+          <p class="admin-succes" id="session-succes" hidden></p>
+          <div class="form-boutons">
+            <button type="submit" class="btn btn-primary" id="btn-session">Publier la session</button>
+            <button type="button" class="btn btn-ghost" id="btn-session-annuler" hidden>Annuler la modification</button>
+          </div>
+        </form>
+      </div>
     </section>
 
     <!-- Témoignages vidéo affichés sur l'accueil -->

@@ -74,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var onglets = document.getElementById("admin-onglets");
   var vues = {
     demandes: vueDemandes,
+    formations: document.getElementById("vue-formations"),
     temoignages: document.getElementById("vue-temoignages"),
     compte: document.getElementById("vue-compte"),
     collaborateurs: document.getElementById("vue-collaborateurs")
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     if (nom === "collaborateurs") chargerAdmins();
     if (nom === "temoignages") chargerTemoignages();
+    if (nom === "formations") chargerSessions();
   }
 
   onglets.addEventListener("click", function (e) {
@@ -789,6 +791,150 @@ document.addEventListener("DOMContentLoaded", function () {
     }).then(function () {
       bouton.disabled = false;
       bouton.textContent = "Ajouter le témoignage";
+    });
+  });
+
+  // --- Sessions de la formation certifiante (page Services) ---
+  var sessionsFormation = [];
+  var sessionEnEdition = null;
+  var listeSessions = document.getElementById("sessions-admin-liste");
+  var erreurSessions = document.getElementById("form-erreur");
+  var formSession = document.getElementById("form-session");
+
+  function montrerErreurSessions(message) {
+    erreurSessions.textContent = message || "";
+    erreurSessions.hidden = !message;
+  }
+
+  function periodeSession(s) {
+    var opts = { weekday: "short", day: "numeric", month: "long", year: "numeric" };
+    var debut = new Date(s.date_debut + "T12:00:00").toLocaleDateString("fr-FR", opts);
+    if (!s.date_fin || s.date_fin === s.date_debut) return debut;
+    return debut + " → " + new Date(s.date_fin + "T12:00:00").toLocaleDateString("fr-FR", opts);
+  }
+
+  function chargerSessions() {
+    montrerErreurSessions("");
+    sb.from("sessions_formation").select("*").order("date_debut", { ascending: false }).then(function (res) {
+      if (res.error) return montrerErreurSessions("Impossible de charger les sessions : " + res.error.message);
+      sessionsFormation = res.data || [];
+      rendreSessions();
+    });
+  }
+
+  function rendreSessions() {
+    var aujourdhui = new Date().toISOString().slice(0, 10);
+    document.getElementById("sessions-admin-vide").hidden = sessionsFormation.length > 0;
+    listeSessions.innerHTML = sessionsFormation.map(function (s, i) {
+      var passee = (s.date_fin || s.date_debut) < aujourdhui;
+      var etat = passee ? "○ Terminée (plus affichée)" : (s.publie ? "● Affichée sur le site" : "○ Masquée");
+      var debut = new Date(s.date_debut + "T12:00:00");
+      return '<li class="temoi-admin' + (passee || !s.publie ? " temoi-masque" : "") + '">' +
+        '<div class="session-date session-date-admin"><strong>' + debut.getDate() + "</strong><span>" +
+          debut.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "") + "</span></div>" +
+        '<div class="temoi-admin-infos"><strong>' + echapper(periodeSession(s)) + "</strong>" +
+          [s.horaires, s.lieu, s.places ? s.places + " places" : "", s.note].filter(Boolean).map(function (x) {
+            return "<span>" + echapper(x) + "</span>";
+          }).join("") +
+          '<span class="temoi-etat">' + etat + "</span></div>" +
+        '<div class="temoi-admin-actions">' +
+          '<button type="button" class="btn btn-ghost btn-petit" data-session-modifier="' + i + '">Modifier</button>' +
+          (passee ? "" : '<button type="button" class="btn btn-ghost btn-petit" data-session-publier="' + i + '">' + (s.publie ? "Masquer" : "Afficher") + "</button>") +
+          '<button type="button" class="btn btn-ghost btn-petit" data-session-supprimer="' + i + '">Supprimer</button>' +
+        "</div></li>";
+    }).join("");
+  }
+
+  function reinitialiserFormSession() {
+    sessionEnEdition = null;
+    formSession.reset();
+    document.getElementById("titre-form-session").textContent = "Ajouter une session";
+    document.getElementById("btn-session").textContent = "Publier la session";
+    document.getElementById("btn-session-annuler").hidden = true;
+  }
+
+  listeSessions.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+
+    if (b.hasAttribute("data-session-modifier")) {
+      var s = sessionsFormation[Number(b.getAttribute("data-session-modifier"))];
+      sessionEnEdition = s.id;
+      document.getElementById("session-debut").value = s.date_debut;
+      document.getElementById("session-fin").value = s.date_fin || "";
+      document.getElementById("session-horaires").value = s.horaires || "";
+      document.getElementById("session-places").value = s.places || "";
+      document.getElementById("session-lieu").value = s.lieu || "";
+      document.getElementById("session-note").value = s.note || "";
+      document.getElementById("titre-form-session").textContent = "Modifier la session";
+      document.getElementById("btn-session").textContent = "Enregistrer les modifications";
+      document.getElementById("btn-session-annuler").hidden = false;
+      formSession.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    if (b.hasAttribute("data-session-publier")) {
+      var cible = sessionsFormation[Number(b.getAttribute("data-session-publier"))];
+      b.disabled = true;
+      sb.from("sessions_formation").update({ publie: !cible.publie }).eq("id", cible.id).then(function (res) {
+        if (res.error) { b.disabled = false; return montrerErreurSessions("Modification impossible : " + res.error.message); }
+        chargerSessions();
+      });
+      return;
+    }
+
+    if (b.hasAttribute("data-session-supprimer")) {
+      if (b.getAttribute("data-confirmer") !== "1") {
+        b.setAttribute("data-confirmer", "1");
+        b.textContent = "Confirmer la suppression ?";
+        b.classList.add("btn-danger");
+        return;
+      }
+      var aSupprimer = sessionsFormation[Number(b.getAttribute("data-session-supprimer"))];
+      b.disabled = true;
+      sb.from("sessions_formation").delete().eq("id", aSupprimer.id).then(function (res) {
+        if (res.error) { b.disabled = false; return montrerErreurSessions("Suppression impossible : " + res.error.message); }
+        if (sessionEnEdition === aSupprimer.id) reinitialiserFormSession();
+        chargerSessions();
+      });
+    }
+  });
+
+  document.getElementById("btn-session-annuler").addEventListener("click", reinitialiserFormSession);
+
+  formSession.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var succes = document.getElementById("session-succes");
+    succes.hidden = true;
+    montrerErreurSessions("");
+    var val = function (id) { return document.getElementById(id).value.trim(); };
+    var debut = val("session-debut");
+    var fin = val("session-fin");
+    if (!debut) return montrerErreurSessions("Indiquez la date de début.");
+    if (fin && fin < debut) return montrerErreurSessions("La date de fin doit être après la date de début.");
+
+    var donnees = {
+      date_debut: debut,
+      date_fin: fin || null,
+      horaires: val("session-horaires") || null,
+      lieu: val("session-lieu") || null,
+      places: val("session-places") ? Number(val("session-places")) : null,
+      note: val("session-note") || null
+    };
+    var bouton = document.getElementById("btn-session");
+    bouton.disabled = true;
+    var requete = sessionEnEdition
+      ? sb.from("sessions_formation").update(donnees).eq("id", sessionEnEdition)
+      : sb.from("sessions_formation").insert(Object.assign({ publie: true }, donnees));
+    var modification = !!sessionEnEdition;
+
+    requete.then(function (res) {
+      bouton.disabled = false;
+      if (res.error) return montrerErreurSessions("Enregistrement impossible : " + res.error.message);
+      reinitialiserFormSession();
+      succes.textContent = modification ? "Session modifiée." : "Session publiée : elle apparaît sur la page Services.";
+      succes.hidden = false;
+      chargerSessions();
     });
   });
 });

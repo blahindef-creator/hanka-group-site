@@ -92,7 +92,7 @@
 
   <section id="formation">
     <div class="container about-grid">
-      <div class="placeholder-box" aria-hidden="true">[Visuel du service — à fournir]</div>
+      <img class="service-photo service-photo-haut" src="assets/services/formation-conference.jpg" alt="Une intervenante anime une formation devant une salle comble" loading="lazy">
       <div>
         <p class="section-eyebrow">03 · Formation certifiante en marchés publics</p>
         <h2>Formation certifiante en marchés publics</h2>
@@ -102,7 +102,12 @@
           <li>Constituer un dossier de soumission conforme</li>
           <li>Certificat délivré en fin de formation</li>
         </ul>
-        <a href="contact.html" class="btn btn-primary">Demander un devis</a>
+        <div class="sessions-formation" id="sessions-formation">
+          <h3>Prochaines sessions</h3>
+          <ul class="sessions-liste" id="sessions-liste"></ul>
+          <p class="sessions-vide" id="sessions-vide">Les prochaines dates seront annoncées très bientôt. Réserve dès maintenant pour être prioritaire.</p>
+        </div>
+        <button type="button" class="btn btn-primary" data-ouvrir-reservation>Réserve ta place</button>
       </div>
     </div>
   </section>
@@ -166,6 +171,29 @@
     </div>
   </section>
 
+
+  <!-- Réservation de place (formation certifiante) : finalisée sur WhatsApp -->
+  <div class="resa-modale" id="resa-modale" role="dialog" aria-modal="true" aria-labelledby="resa-titre" hidden>
+    <div class="resa-fond" data-fermer-reservation></div>
+    <div class="resa-carte">
+      <button type="button" class="resa-fermer" data-fermer-reservation aria-label="Fermer">✕</button>
+      <p class="section-eyebrow">Formation certifiante en marchés publics</p>
+      <h2 id="resa-titre">Réserve ta place</h2>
+      <p class="resa-prix">Réservation : <strong>10 000 FCFA</strong></p>
+      <p class="resa-texte">Indique ton nom (facultatif), puis clique sur le bouton : la conversation WhatsApp avec HANKA GROUP s'ouvre avec ton message déjà rédigé. Notre équipe confirme ta place et t'indique comment régler la réservation.</p>
+      <div id="resa-bloc-session" hidden>
+        <label for="resa-session">Session choisie</label>
+        <select id="resa-session"></select>
+      </div>
+      <label for="resa-nom">Ton nom et prénom (facultatif)</label>
+      <input type="text" id="resa-nom" maxlength="100" placeholder="Ex. Awa Koné" autocomplete="name">
+      <a class="btn-whatsapp" id="resa-whatsapp" href="https://wa.me/2250172976418" target="_blank" rel="noopener">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.14c-.24.68-1.42 1.31-1.95 1.36-.5.05-.97.23-3.27-.68-2.77-1.09-4.52-3.92-4.66-4.1-.13-.18-1.1-1.47-1.1-2.8 0-1.33.7-1.99.95-2.26.24-.27.53-.34.71-.34h.51c.16 0 .38-.06.6.46.24.55.79 1.9.86 2.04.07.14.11.3.02.48-.09.18-.14.3-.27.46-.14.16-.29.36-.41.48-.14.14-.28.29-.12.56.16.27.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.21 1.37.27.14.43.11.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.6-.14.25.09 1.57.74 1.84.88.27.14.45.2.52.32.07.11.07.66-.17 1.33z"/></svg>
+        Fais ta réservation : ta place à 10 000 FCFA
+      </a>
+      <p class="resa-note">WhatsApp : +225 01 72 97 64 18</p>
+    </div>
+  </div>
 </main>
 
 <footer class="site-footer">
@@ -201,6 +229,8 @@
 </footer>
 
 <script src="js/script.js"></script>
+<script src="js/config.js"></script>
+<script src="js/reservation.js"></script>
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
 </body>
 </html>
