@@ -40,36 +40,30 @@
 
 <main>
 
-  <section class="hero hero-v2">
-    <!-- Photos en fondu sur la droite (modifiables dans l'admin : onglet Visuels) -->
-    <div class="hero-slider hero-visuel" aria-roledescription="carrousel" aria-label="HANKA GROUP en images">
-      <div class="hero-slide is-active">
-        <img data-visuel="accueil-diapo-1" src="assets/hero/formation-salle.jpg" alt="Participants lors d'une session de formation HANKA GROUP">
-      </div>
-      <div class="hero-slide">
-        <img data-visuel="accueil-diapo-2" src="assets/hero/intervenante.jpg" alt="Une intervenante prend la parole au micro">
-      </div>
-      <div class="hero-dots" role="tablist" aria-label="Choisir une image"></div>
-    </div>
-
-    <div class="container hero-v2-contenu">
-      <div class="hero-v2-texte">
-        <p class="hero-pastille">Abidjan · Côte d'Ivoire</p>
-        <h1>Votre partenaire pour créer, former et <span>développer votre activité</span></h1>
+  <section class="hero">
+    <div class="container">
+      <div>
+        <p class="hero-eyebrow">Abidjan · Côte d'Ivoire</p>
+        <h1>Votre partenaire pour créer, former et développer votre activité</h1>
         <p>HANKA GROUP accompagne entrepreneurs, entreprises et institutions dans leurs démarches de création, de formation et de développement — avec un interlocuteur unique du premier contact à la mise en œuvre.</p>
-        <div class="hero-v2-actions">
-          <a href="services.html" class="btn btn-primary">Voir nos services</a>
-          <a href="tel:+2250172976418" class="hero-appel">
-            <span class="hero-appel-icone" aria-hidden="true">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            </span>
-            <span class="hero-appel-texte"><small>Appelez-nous à tout moment</small><strong>+225 01 72 97 64 18</strong></span>
-          </a>
+        <div class="hero-actions">
+          <a href="services.html" class="btn btn-outline">Voir nos services</a>
         </div>
+      </div>
+      <div class="hero-slider" aria-roledescription="carrousel" aria-label="HANKA GROUP en images">
+        <div class="hero-slide hero-slide-logo is-active">
+          <img src="assets/logo-hanka-group.png" alt="Logo HANKA GROUP — Innover, Construire, Valoriser">
+        </div>
+        <div class="hero-slide">
+          <img data-visuel="accueil-diapo-1" src="assets/hero/formation-salle.jpg" alt="Participants lors d'une session de formation HANKA GROUP" loading="lazy">
+        </div>
+        <div class="hero-slide">
+          <img data-visuel="accueil-diapo-2" src="assets/hero/intervenante.jpg" alt="Une intervenante prend la parole au micro" loading="lazy">
+        </div>
+        <div class="hero-dots" role="tablist" aria-label="Choisir une image"></div>
       </div>
     </div>
   </section>
-
 
   <section class="chiffres" aria-label="HANKA GROUP en chiffres">
     <div class="container chiffres-grid">
