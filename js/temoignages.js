@@ -1,6 +1,6 @@
 // Section « Nos clients parlent de nous » : cartes vidéo défilantes + lecture dans une fenêtre.
 // Les témoignages sont gérés depuis l'espace admin (onglet Témoignages) et lus dans la base ;
-// sans témoignage publié, la section affiche une invitation à partager son expérience.
+// sans témoignage publié, la section affiche une simple phrase d'attente (aucune action visiteur).
 
 document.addEventListener("DOMContentLoaded", function () {
   var section = document.getElementById("temoignages");
