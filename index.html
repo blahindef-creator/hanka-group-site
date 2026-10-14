@@ -40,30 +40,40 @@
 
 <main>
 
-  <section class="hero">
-    <div class="container">
-      <div>
-        <p class="hero-eyebrow">Abidjan · Côte d'Ivoire</p>
-        <h1>Votre partenaire pour créer, former et développer votre activité</h1>
-        <p>HANKA GROUP accompagne entrepreneurs, entreprises et institutions dans leurs démarches de création, de formation et de développement — avec un interlocuteur unique du premier contact à la mise en œuvre.</p>
-        <div class="hero-actions">
-          <a href="services.html" class="btn btn-outline">Voir nos services</a>
-        </div>
+  <section class="hero hero-v3">
+    <!-- Photos qui défilent à droite, fondues dans le dégradé bleu (modifiables dans l'admin : onglet Visuels) -->
+    <div class="hero-slider hero-v3-photos" aria-roledescription="carrousel" aria-label="HANKA GROUP en images">
+      <div class="hero-slide is-active">
+        <img data-visuel="accueil-diapo-1" src="assets/hero/equipe-ordinateur.jpg" alt="Deux professionnels souriants avec un ordinateur portable">
       </div>
-      <div class="hero-slider" aria-roledescription="carrousel" aria-label="HANKA GROUP en images">
-        <div class="hero-slide hero-slide-logo is-active">
-          <img src="assets/logo-hanka-group.png" alt="Logo HANKA GROUP — Innover, Construire, Valoriser">
-        </div>
-        <div class="hero-slide">
-          <img data-visuel="accueil-diapo-1" src="assets/hero/formation-salle.jpg" alt="Participants lors d'une session de formation HANKA GROUP" loading="lazy">
-        </div>
-        <div class="hero-slide">
-          <img data-visuel="accueil-diapo-2" src="assets/hero/intervenante.jpg" alt="Une intervenante prend la parole au micro" loading="lazy">
-        </div>
-        <div class="hero-dots" role="tablist" aria-label="Choisir une image"></div>
+      <div class="hero-slide">
+        <img data-visuel="accueil-diapo-2" src="assets/hero/formation-salle.jpg" alt="Participants lors d'une session de formation HANKA GROUP">
+      </div>
+      <div class="hero-slide">
+        <img data-visuel="accueil-diapo-3" src="assets/hero/intervenante.jpg" alt="Une intervenante prend la parole au micro">
+      </div>
+      <div class="hero-dots" role="tablist" aria-label="Choisir une image"></div>
+    </div>
+    <img class="hero-v3-logo" src="assets/logo-hanka-group.png" alt="HANKA GROUP — Innover, Construire, Valoriser">
+
+    <div class="container hero-v3-contenu">
+      <div class="hero-v3-texte">
+        <p class="hero-v3-lieu">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+          Abidjan • Côte d'Ivoire
+        </p>
+        <h1>Votre partenaire pour créer, former et développer <span>votre activité</span></h1>
+        <p>HANKA GROUP accompagne entrepreneurs, entreprises et institutions dans leurs démarches de création, de formation et de développement — avec un interlocuteur unique du premier contact à la mise en œuvre.</p>
+        <a href="services.html" class="hero-v3-bouton">
+          Voir nos services
+          <span aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </span>
+        </a>
       </div>
     </div>
   </section>
+
 
   <section class="chiffres" aria-label="HANKA GROUP en chiffres">
     <div class="container chiffres-grid">

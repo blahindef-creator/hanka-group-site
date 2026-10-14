@@ -4,7 +4,8 @@
 // format : proportions conseillées pour la nouvelle image
 
 var EMPLACEMENTS_VISUELS = [
-  { cle: "accueil-diapo-1", page: "Accueil", nom: "Diaporama d'accueil — photo 1", defaut: "assets/hero/formation-salle.jpg", format: "portrait 3:4" },
-  { cle: "accueil-diapo-2", page: "Accueil", nom: "Diaporama d'accueil — photo 2", defaut: "assets/hero/intervenante.jpg", format: "portrait 3:4" },
+  { cle: "accueil-diapo-1", page: "Accueil", nom: "Haut de l'accueil — photo 1", defaut: "assets/hero/equipe-ordinateur.jpg", format: "paysage, sujets à droite" },
+  { cle: "accueil-diapo-2", page: "Accueil", nom: "Haut de l'accueil — photo 2", defaut: "assets/hero/formation-salle.jpg", format: "paysage, sujets à droite" },
+  { cle: "accueil-diapo-3", page: "Accueil", nom: "Haut de l'accueil — photo 3", defaut: "assets/hero/intervenante.jpg", format: "paysage, sujets à droite" },
   { cle: "apropos-photo", page: "À propos", nom: "Photo « Qui sommes-nous ? »", defaut: "assets/hero/formation-salle.jpg", format: "paysage 4:3" }
 ];
