@@ -1512,3 +1512,4 @@ a.pub-image:hover img { transform: scale(1.03); }
 .contact-merci:focus { outline: none; }
 .contact-merci h3 { margin: 0 0 0.4rem; color: var(--blue-dark); font-size: 1.3rem; }
 .contact-merci p { margin: 0 0 0.4rem; color: var(--gray-600); }
+.admin-main section.admin-login { padding: 2rem; }

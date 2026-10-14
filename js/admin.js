@@ -65,8 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
       cellules: function (d) {
         return [
           echapper(d.service || "—"),
-          '<div class="cellule-texte">' + echapper(d.message).replace(/
-/g, "<br>") + "</div>"
+          '<div class="cellule-texte">' + echapper(d.message).replace(/\n/g, "<br>") + "</div>"
         ];
       },
       colonnesExport: ["Service", "Message"],
@@ -101,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
     compte: document.getElementById("vue-compte"),
     collaborateurs: document.getElementById("vue-collaborateurs")
   };
-  var utilisateurCourant = null;
+  var utilisateurCourant; // « undefined » au départ : le premier affichage (connecté ou non) a toujours lieu
   var estPrincipal = false;
 
   function afficherOnglet(nom) {
