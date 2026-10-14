@@ -1177,3 +1177,16 @@ input[type="file"] { padding: 0.5rem; background: var(--white); }
 .badge-compte { display: inline-block; margin-bottom: 0.35rem; padding: 0.15rem 0.55rem; border-radius: 999px; background: #e1eaff; color: var(--blue); font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
 .admin-docs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.25rem; }
 .admin-docs .lien-bouton { font-size: 0.8rem; text-align: left; overflow-wrap: anywhere; }
+
+/* --- Fonds en dégradé jaune (remplace les fonds blancs / gris clair des pages) --- */
+:root {
+  --degrade-jaune: linear-gradient(135deg, #fffdf6 0%, #fff4d4 55%, #ffeab0 100%);
+  --degrade-jaune-alt: linear-gradient(135deg, #fff6d9 0%, #ffe9a6 100%);
+}
+body { background: #fffaf0; }
+main > section:not(.hero):not(.cta-band):not(.temoignages):not(.bg-alt) { background: var(--degrade-jaune); }
+main > section.bg-alt { background: var(--degrade-jaune-alt); }
+.admin-body { background: var(--degrade-jaune) fixed; }
+.chiffres { border-bottom-color: rgba(217, 158, 13, 0.25); }
+/* Les cartes restent blanches pour ressortir sur le fond jaune */
+.feature { background: var(--white); }
