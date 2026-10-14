@@ -1368,3 +1368,31 @@ a.pub-image:hover img { transform: scale(1.03); }
 @media (max-width: 640px) { .pub-admin-image { width: 96px; height: 54px; } }
 .temoi-admin:has(.pub-admin-image) { grid-template-columns: 128px 1fr auto; }
 @media (max-width: 640px) { .temoi-admin:has(.pub-admin-image) { grid-template-columns: 96px 1fr; } }
+
+/* Témoignages : invitation affichée tant qu'aucune vidéo n'est publiée */
+.temoignages-invitation {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.5rem 1.75rem;
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(6, 27, 74, 0.08);
+}
+.temoignages-invitation-icone {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  color: var(--gold);
+  font-size: 1.5rem;
+}
+.temoignages-invitation h3 { margin: 0 0 0.3rem; color: var(--blue-dark); font-size: 1.15rem; }
+.temoignages-invitation p { margin: 0; color: var(--gray-600); font-size: 0.96rem; }
+.temoignages-invitation .btn-whatsapp { margin: 0; white-space: nowrap; }
+@media (max-width: 760px) {
+  .temoignages-invitation { grid-template-columns: 1fr; text-align: center; justify-items: center; }
+}

@@ -1,6 +1,6 @@
 // Section « Nos clients parlent de nous » : cartes vidéo défilantes + lecture dans une fenêtre.
 // Les témoignages sont gérés depuis l'espace admin (onglet Témoignages) et lus dans la base ;
-// la section reste masquée tant qu'aucun témoignage n'est publié.
+// sans témoignage publié, la section affiche une invitation à partager son expérience.
 
 document.addEventListener("DOMContentLoaded", function () {
   var section = document.getElementById("temoignages");
@@ -58,6 +58,8 @@ function afficherTemoignages(section, TEMOIGNAGES) {
       "</li>";
   }).join("");
   section.hidden = false;
+  document.getElementById("temoignages-invitation").hidden = true;
+  section.querySelector(".temoignages-nav").hidden = false;
 
   // --- Défilement avec les flèches ---
   section.querySelector(".temoignages-nav").addEventListener("click", function (e) {
