@@ -23,8 +23,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Diaporamas (accueil, services) : une image toutes les 3 s, pause au survol
-  document.querySelectorAll(".hero-slider").forEach(function (slider) {
+  // Diaporamas (accueil, services) : une image toutes les 3 s, pause au survol.
+  // window.hankaDiaporama sert aussi aux galeries créées après chargement (js/galeries.js).
+  window.hankaDiaporama = function (slider) {
     var slides = slider.querySelectorAll(".hero-slide");
     var dotsBox = slider.querySelector(".hero-dots");
     var current = 0;
@@ -58,7 +59,9 @@ document.addEventListener("DOMContentLoaded", function () {
     slider.addEventListener("mouseenter", stop);
     slider.addEventListener("mouseleave", start);
     start();
-  });
+    slider.hankaArreter = stop;
+  };
+  document.querySelectorAll(".hero-slider").forEach(window.hankaDiaporama);
 
   var form = document.querySelector(".contact-form");
   if (form) {

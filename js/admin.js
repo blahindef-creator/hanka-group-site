@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (nom === "collaborateurs") chargerAdmins();
     if (nom === "temoignages") chargerTemoignages();
     if (nom === "formations") chargerSessions();
-    if (nom === "visuels") chargerVisuels();
+    if (nom === "visuels") { chargerVisuels(); chargerGaleries(); }
     if (nom === "publicites") chargerPubs();
   }
 
@@ -1189,5 +1189,137 @@ document.addEventListener("DOMContentLoaded", function () {
       bouton.disabled = false;
       bouton.textContent = "Publier la publicité";
     });
+  });
+  // --- Onglet Visuels : galeries de photos des services (7 maximum par service) ---
+  var SERVICES_GALERIE = [
+    ["creation", "01 · Création d'entreprise"],
+    ["modification", "02 · Modification d'entreprise"],
+    ["formation", "03 · Formation certifiante en marchés publics"],
+    ["procedures", "04 · Procédures administratives"],
+    ["immobilier", "05 · Immobilier"],
+    ["communication", "06 · Communication digitale"]
+  ];
+  var MAX_PHOTOS_SERVICE = 7;
+  var photosServices = [];
+  var zoneGaleries = document.getElementById("galeries-admin");
+
+  function erreurGaleries(message) {
+    var e = document.getElementById("galeries-erreur");
+    e.textContent = message || "";
+    e.hidden = !message;
+  }
+
+  function chargerGaleries() {
+    sb.from("photos_services").select("*").order("ordre").order("created_at").then(function (res) {
+      if (res.error) return erreurGaleries("Impossible de charger les galeries : " + res.error.message);
+      photosServices = res.data || [];
+      rendreGaleries();
+    });
+  }
+
+  function photosDe(service) {
+    return photosServices.filter(function (p) { return p.service === service; });
+  }
+
+  function rendreGaleries() {
+    zoneGaleries.innerHTML = SERVICES_GALERIE.map(function (s) {
+      var photos = photosDe(s[0]);
+      var reste = MAX_PHOTOS_SERVICE - photos.length;
+      return '<div class="galerie-admin">' +
+        '<div class="galerie-admin-tete"><h3>' + echapper(s[1]) + "</h3>" +
+          '<span class="galerie-compteur' + (reste === 0 ? " galerie-pleine" : "") + '">' + photos.length + " / " + MAX_PHOTOS_SERVICE + " photos</span></div>" +
+        (photos.length
+          ? '<ul class="galerie-photos">' + photos.map(function (p, i) {
+              return '<li><img src="' + echapper(p.url) + '" alt="">' +
+                '<span class="galerie-rang">' + (i + 1) + "</span>" +
+                '<div class="galerie-actions">' +
+                  '<button type="button" data-gal-gauche="' + p.id + '"' + (i === 0 ? " disabled" : "") + ' aria-label="Déplacer avant">←</button>' +
+                  '<button type="button" data-gal-droite="' + p.id + '"' + (i === photos.length - 1 ? " disabled" : "") + ' aria-label="Déplacer après">→</button>' +
+                  '<button type="button" class="galerie-suppr" data-gal-suppr="' + p.id + '" aria-label="Supprimer">✕</button>' +
+                "</div></li>";
+            }).join("") + "</ul>"
+          : '<p class="form-note">Aucune photo téléversée : la page Services affiche les images d\'origine de ce service.</p>') +
+        (reste > 0
+          ? '<label class="btn btn-ghost btn-petit visuel-remplacer">＋ Ajouter des photos (' + reste + " restante" + (reste > 1 ? "s" : "") + ")" +
+              '<input type="file" multiple accept="image/jpeg,image/png,image/webp" data-gal-ajout="' + s[0] + '"></label>'
+          : '<p class="form-note">Maximum atteint : supprimez une photo pour en ajouter une autre.</p>') +
+        '<p class="galerie-etat" data-gal-etat="' + s[0] + '" hidden></p>' +
+      "</div>";
+    }).join("");
+  }
+
+  zoneGaleries.addEventListener("change", function (e) {
+    var champ = e.target.closest("[data-gal-ajout]");
+    if (!champ || !champ.files.length) return;
+    var service = champ.getAttribute("data-gal-ajout");
+    var etat = zoneGaleries.querySelector('[data-gal-etat="' + service + '"]');
+    var deja = photosDe(service).length;
+    var fichiers = Array.prototype.slice.call(champ.files);
+    erreurGaleries("");
+
+    if (deja + fichiers.length > MAX_PHOTOS_SERVICE) {
+      champ.value = "";
+      return erreurGaleries("Ce service a déjà " + deja + " photo(s) : vous pouvez en ajouter " + (MAX_PHOTOS_SERVICE - deja) + " au maximum (7 par service).");
+    }
+    var probleme = fichiers.map(verifierImage).filter(Boolean)[0];
+    if (probleme) { champ.value = ""; return erreurGaleries(probleme); }
+
+    champ.disabled = true;
+    etat.textContent = "Envoi de " + fichiers.length + " photo(s)...";
+    etat.hidden = false;
+
+    // Envoi l'un après l'autre pour conserver l'ordre choisi
+    fichiers.reduce(function (suite, fichier, i) {
+      return suite.then(function () {
+        return televerserMedia(fichier, "service-" + service).then(function (url) {
+          return sb.from("photos_services").insert({ service: service, url: url, ordre: deja + i }).then(function (r) {
+            if (r.error) { supprimerMedia(url); throw new Error(r.error.message); }
+          });
+        });
+      });
+    }, Promise.resolve())
+      .then(chargerGaleries)
+      .catch(function (err) {
+        erreurGaleries("Envoi interrompu : " + err.message);
+        chargerGaleries();
+      });
+  });
+
+  zoneGaleries.addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    var id = b.getAttribute("data-gal-gauche") || b.getAttribute("data-gal-droite") || b.getAttribute("data-gal-suppr");
+    var photo = photosServices.filter(function (p) { return p.id === id; })[0];
+    if (!photo) return;
+    var liste = photosDe(photo.service);
+
+    if (b.hasAttribute("data-gal-suppr")) {
+      if (b.getAttribute("data-confirmer") !== "1") {
+        b.setAttribute("data-confirmer", "1");
+        b.textContent = "Supprimer ?";
+        b.classList.add("galerie-confirmer");
+        return;
+      }
+      b.disabled = true;
+      sb.from("photos_services").delete().eq("id", id).then(function (r) {
+        if (r.error) { b.disabled = false; return erreurGaleries("Suppression impossible : " + r.error.message); }
+        supprimerMedia(photo.url);
+        chargerGaleries();
+      });
+      return;
+    }
+
+    // Déplacement : on échange avec la voisine, puis on renumérote tout le service
+    var i = liste.indexOf(photo);
+    var j = b.hasAttribute("data-gal-gauche") ? i - 1 : i + 1;
+    liste.splice(j, 0, liste.splice(i, 1)[0]);
+    liste.forEach(function (p, k) { p.ordre = k; });
+    photosServices.sort(function (a, c) { return a.ordre - c.ordre; });
+    rendreGaleries();
+    Promise.all(liste.map(function (p) { return sb.from("photos_services").update({ ordre: p.ordre }).eq("id", p.id); }))
+      .then(function (res) {
+        var err = res.filter(function (r) { return r.error; })[0];
+        if (err) erreurGaleries("Ordre non enregistré : " + err.error.message);
+      });
   });
 });
