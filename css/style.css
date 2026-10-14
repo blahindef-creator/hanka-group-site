@@ -1209,3 +1209,6 @@ main > section.bg-alt { background: var(--degrade-jaune-alt); }
 .espace-statut-aide { font-size: 0.96rem; }
 .espace-details dt { font-size: 0.84rem; }
 .espace-docs li small { font-size: 0.85rem; }
+
+/* Intitulés bleus des services (« 01 · CRÉATION D'ENTREPRISE »...) : plus grands et plus gras */
+.section-eyebrow { font-size: 0.95rem; font-weight: 800; letter-spacing: 1.5px; color: var(--blue); }
