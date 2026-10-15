@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Espace admin — HANKA GROUP</title>
 <link rel="icon" href="assets/favicon.png" type="image/png">
-<link rel="stylesheet" href="css/style.css?v=202610151802">
+<link rel="stylesheet" href="css/style.css?v=202610151812">
 </head>
 <body class="admin-body">
 
@@ -86,6 +86,20 @@
         <button type="button" data-filtre="en_cours">En cours <span></span></button>
         <button type="button" data-filtre="traite">Traitées <span></span></button>
         <button type="button" data-filtre="annule">Annulées <span></span></button>
+      </div>
+
+      <div class="admin-recherche" role="search">
+        <input type="search" id="f-texte" placeholder="Rechercher : nom, téléphone, email, n°, note..." aria-label="Rechercher dans les demandes">
+        <span class="admin-recherche-champs" id="f-specifiques"></span>
+        <select id="f-compte" aria-label="Type de client">
+          <option value="">Tous les clients</option>
+          <option value="oui">Avec compte client</option>
+          <option value="non">Sans compte</option>
+        </select>
+        <label class="admin-recherche-date">Du <input type="date" id="f-du"></label>
+        <label class="admin-recherche-date">Au <input type="date" id="f-au"></label>
+        <button type="button" class="btn btn-ghost btn-petit" id="f-effacer" hidden>Effacer les filtres</button>
+        <span class="admin-recherche-total" id="f-total"></span>
       </div>
 
       <p class="wizard-error" id="erreur-demandes" hidden></p>
@@ -289,6 +303,16 @@
         <h1>Collaborateurs</h1>
         <p class="admin-sub">Les collaborateurs peuvent consulter et traiter les demandes, et exporter les données. Seul l'administrateur principal gère les comptes.</p>
 
+        <div class="admin-recherche" role="search">
+          <input type="search" id="fc-texte" placeholder="Rechercher : nom ou email..." aria-label="Rechercher un collaborateur">
+          <select id="fc-statut" aria-label="Statut du compte">
+            <option value="">Tous les statuts</option>
+            <option value="actif">Actifs</option>
+            <option value="bloque">Bloqués</option>
+          </select>
+          <span class="admin-recherche-total" id="fc-total"></span>
+        </div>
+
         <div class="admin-table-wrap">
           <table class="admin-table admin-table-compacte">
             <thead>
@@ -327,10 +351,10 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=202610151802"></script>
-<script src="js/data/creation-entreprise.js?v=202610151802"></script>
-<script src="js/tarifs.js?v=202610151802"></script>
-<script src="js/data/visuels.js?v=202610151802"></script>
-<script src="js/admin.js?v=202610151802"></script>
+<script src="js/config.js?v=202610151812"></script>
+<script src="js/data/creation-entreprise.js?v=202610151812"></script>
+<script src="js/tarifs.js?v=202610151812"></script>
+<script src="js/data/visuels.js?v=202610151812"></script>
+<script src="js/admin.js?v=202610151812"></script>
 </body>
 </html>

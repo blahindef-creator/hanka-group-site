@@ -21,6 +21,11 @@ document.addEventListener("DOMContentLoaded", function () {
       prefixe: "#",
       titre: "Demandes de création d'entreprise",
       fichier: "creations",
+      filtres: [
+        { champ: "forme_juridique", tous: "Toutes les formes" },
+        { champ: "ville", tous: "Toutes les villes" },
+        { champ: "pack", tous: "Tous les packs", libelle: function (v) { return PACKS[v] ? PACKS[v].nom : v; } }
+      ],
       entetes: ["Forme", "Ville", "Pack", "Prix"],
       cellules: function (d) {
         return [
@@ -41,6 +46,10 @@ document.addEventListener("DOMContentLoaded", function () {
       prefixe: "M",
       titre: "Demandes de modification d'entreprise",
       fichier: "modifications",
+      filtres: [
+        { champ: "forme_actuelle", tous: "Toutes les formes" },
+        { champ: "changements", tous: "Tous les changements", libelle: function (v) { return CHANGEMENTS_POSSIBLES[v] ? CHANGEMENTS_POSSIBLES[v].nom : v; } }
+      ],
       entetes: ["Forme actuelle", "À modifier", "Explication"],
       cellules: function (d) {
         return [
@@ -61,6 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
       titre: "Messages du formulaire de contact",
       fichier: "messages",
       sansDocuments: true,
+      filtres: [{ champ: "service", tous: "Tous les services" }],
       entetes: ["Service", "Message"],
       cellules: function (d) {
         return [
@@ -221,6 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
         demandes = res.data || [];
+        construireFiltresType();
         rendre();
         chargerDocuments(typeCharge);
       });
@@ -269,15 +280,100 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
+  // --- Recherche et filtres (en plus du filtre par statut) ---
+  var champTexte = document.getElementById("f-texte");
+  var zoneSpecifiques = document.getElementById("f-specifiques");
+  var champCompte = document.getElementById("f-compte");
+  var champDu = document.getElementById("f-du");
+  var champAu = document.getElementById("f-au");
+  var criteres = {}; // champ propre au type → valeur choisie
+
+  // Minuscules sans accents : « Société » se trouve en tapant « societe »
+  function normaliser(s) {
+    return String(s == null ? "" : s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  // Listes déroulantes du type affiché, remplies avec les valeurs présentes dans les demandes
+  function construireFiltresType() {
+    var precedents = criteres;
+    criteres = {};
+    zoneSpecifiques.innerHTML = type().filtres.map(function (f) {
+      var valeurs = {};
+      demandes.forEach(function (d) {
+        [].concat(d[f.champ] == null ? [] : d[f.champ]).forEach(function (v) { if (v !== "") valeurs[v] = true; });
+      });
+      var options = Object.keys(valeurs).sort(function (a, b) {
+        return (f.libelle ? f.libelle(a) : a).localeCompare(f.libelle ? f.libelle(b) : b, "fr");
+      }).map(function (v) {
+        if (precedents[f.champ] === v) criteres[f.champ] = v;
+        return '<option value="' + echapper(v) + '"' + (criteres[f.champ] === v ? " selected" : "") + '>' + echapper(f.libelle ? f.libelle(v) : v) + "</option>";
+      }).join("");
+      return '<select data-critere="' + f.champ + '" aria-label="' + echapper(f.tous) + '"><option value="">' + echapper(f.tous) + "</option>" + options + "</select>";
+    }).join("");
+    champCompte.hidden = !!type().sansDocuments;
+  }
+
+  function filtresActifs() {
+    return !!(champTexte.value.trim() || champDu.value || champAu.value || (!champCompte.hidden && champCompte.value) ||
+      Object.keys(criteres).some(function (k) { return criteres[k]; }));
+  }
+
+  // Tous les critères sauf le statut (les compteurs des boutons de statut en dépendent)
+  function correspondRecherche(d) {
+    var texte = normaliser(champTexte.value.trim());
+    if (texte) {
+      var contenu = normaliser([
+        type().prefixe + d.numero, d.numero, d.prenom, d.nom, d.telephone, (d.telephone || "").replace(/\s/g, ""), d.email, d.note_admin
+      ].concat(type().valeursExport(d)).join(" "));
+      if (texte.split(/\s+/).some(function (mot) { return contenu.indexOf(mot) === -1; })) return false;
+    }
+    var jour = d.created_at.slice(0, 10);
+    if (champDu.value && jour < champDu.value) return false;
+    if (champAu.value && jour > champAu.value) return false;
+    if (!champCompte.hidden && champCompte.value === "oui" && !d.client_id) return false;
+    if (!champCompte.hidden && champCompte.value === "non" && d.client_id) return false;
+    return Object.keys(criteres).every(function (champ) {
+      var v = criteres[champ];
+      return !v || [].concat(d[champ] == null ? [] : d[champ]).map(String).indexOf(v) !== -1;
+    });
+  }
+
+  function demandesFiltrees() {
+    return demandes.filter(function (d) { return (!filtre || d.statut === filtre) && correspondRecherche(d); });
+  }
+
+  function surChangementFiltre() { rendre(); }
+  champTexte.addEventListener("input", surChangementFiltre);
+  [champCompte, champDu, champAu].forEach(function (c) { c.addEventListener("change", surChangementFiltre); });
+  zoneSpecifiques.addEventListener("change", function (e) {
+    var s = e.target.closest("[data-critere]");
+    if (!s) return;
+    criteres[s.getAttribute("data-critere")] = s.value;
+    rendre();
+  });
+  document.getElementById("f-effacer").addEventListener("click", function () {
+    champTexte.value = "";
+    champCompte.value = "";
+    champDu.value = "";
+    champAu.value = "";
+    criteres = {};
+    construireFiltresType();
+    rendre();
+  });
+
   function rendre() {
+    var recherche = demandes.filter(correspondRecherche);
     document.querySelectorAll(".admin-filtres button").forEach(function (b) {
       var f = b.getAttribute("data-filtre");
-      var n = f ? demandes.filter(function (d) { return d.statut === f; }).length : demandes.length;
+      var n = f ? recherche.filter(function (d) { return d.statut === f; }).length : recherche.length;
       b.querySelector("span").textContent = "(" + n + ")";
       b.setAttribute("aria-selected", f === filtre ? "true" : "false");
     });
 
-    var liste = demandes.filter(function (d) { return !filtre || d.statut === filtre; });
+    var liste = demandesFiltrees();
+    var actifs = filtresActifs();
+    document.getElementById("f-effacer").hidden = !actifs;
+    document.getElementById("f-total").textContent = actifs ? liste.length + " résultat(s) sur " + demandes.length : "";
     document.getElementById("admin-vide").hidden = liste.length > 0;
 
     document.getElementById("entete-demandes").innerHTML = "<tr>" +
@@ -320,6 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!b || b.getAttribute("data-type") === typeCourant) return;
     typeCourant = b.getAttribute("data-type");
     filtre = "";
+    criteres = {};
     demandes = [];
     rendre();
     charger();
@@ -356,8 +453,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function lignesExport() {
-    return demandes
-      .filter(function (d) { return !filtre || d.statut === filtre; })
+    return demandesFiltrees()
       .map(function (d) {
         return [
           type().prefixe + d.numero,
@@ -418,7 +514,7 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.setTextColor(90);
         doc.text(
           "Export du " + new Date().toLocaleString("fr-FR") +
-          " · Filtre : " + (filtre ? STATUTS[filtre] : "toutes") +
+          " · Filtre : " + (filtre ? STATUTS[filtre] : "toutes") + (filtresActifs() ? " + recherche" : "") +
           " · " + lignes.length + " demande(s)" +
           (total === null ? "" : " · Total : " + formaterFCFA(total)),
           40, 58
@@ -533,30 +629,56 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!estPrincipal) return;
     erreurCollab.hidden = true;
     appelerGestion({ action: "lister" }).then(function (d) {
-      listeAdmins.innerHTML = d.admins.map(function (a) {
-        var principal = a.role === "principal";
-        var email = echapper(a.email);
-        var actions = principal ? "" :
-          '<div class="collab-actions">' +
-          '<button type="button" class="btn btn-ghost btn-petit" data-gestion="mot_de_passe" data-email="' + email + '">Nouveau mot de passe</button>' +
-          (a.bloque
-            ? '<button type="button" class="btn btn-ghost btn-petit" data-gestion="activer" data-email="' + email + '">Réactiver</button>'
-            : '<button type="button" class="btn btn-ghost btn-petit" data-gestion="bloquer" data-email="' + email + '">Bloquer</button>') +
-          '<button type="button" class="btn btn-ghost btn-petit" data-gestion="retirer" data-email="' + email + '">Retirer</button>' +
-          "</div>";
-        return '<tr class="' + (a.bloque ? "collab-bloque" : "") + '">' +
-          "<td>" + echapper(a.nom || "—") + "</td>" +
-          "<td>" + email + "</td>" +
-          "<td>" + (principal ? "Administrateur principal" : "Collaborateur") + "</td>" +
-          "<td>" + (a.bloque ? '<span class="collab-statut collab-statut-bloque">Bloqué</span>' : '<span class="collab-statut">Actif</span>') + "</td>" +
-          "<td>" + new Date(a.created_at).toLocaleDateString("fr-FR") + "</td>" +
-          "<td>" + actions + "</td>" +
-          "</tr>";
-      }).join("");
+      adminsCharges = d.admins;
+      // Bloquer / nouveau mot de passe : seulement si la fonction serveur gère ces actions (elle renvoie alors « bloque »)
+      gestionAvancee = d.admins.some(function (a) { return "bloque" in a; });
+      collabStatut.hidden = !gestionAvancee;
+      rendreAdmins();
     }).catch(function (err) {
       erreurCollab.textContent = "Impossible de charger les comptes : " + err.message;
       erreurCollab.hidden = false;
     });
+  }
+
+  // Recherche dans les collaborateurs (nom / email) et filtre Actifs / Bloqués
+  var adminsCharges = [];
+  var gestionAvancee = false;
+  var collabTexte = document.getElementById("fc-texte");
+  var collabStatut = document.getElementById("fc-statut");
+  collabTexte.addEventListener("input", rendreAdmins);
+  collabStatut.addEventListener("change", rendreAdmins);
+
+  function rendreAdmins() {
+    var texte = normaliser(collabTexte.value.trim());
+    var liste = adminsCharges.filter(function (a) {
+      if (texte && normaliser(a.nom + " " + a.email).indexOf(texte) === -1) return false;
+      if (collabStatut.value === "bloque" && !a.bloque) return false;
+      if (collabStatut.value === "actif" && a.bloque) return false;
+      return true;
+    });
+    var actifs = texte || collabStatut.value;
+    document.getElementById("fc-total").textContent = actifs ? liste.length + " résultat(s) sur " + adminsCharges.length : "";
+    listeAdmins.innerHTML = liste.map(function (a) {
+      var principal = a.role === "principal";
+      var email = echapper(a.email);
+      var actions = principal ? "" :
+        '<div class="collab-actions">' +
+        (gestionAvancee ? '<button type="button" class="btn btn-ghost btn-petit" data-gestion="mot_de_passe" data-email="' + email + '">Nouveau mot de passe</button>' : "") +
+        (!gestionAvancee ? "" : a.bloque
+          ? '<button type="button" class="btn btn-ghost btn-petit" data-gestion="activer" data-email="' + email + '">Réactiver</button>'
+          : '<button type="button" class="btn btn-ghost btn-petit" data-gestion="bloquer" data-email="' + email + '">Bloquer</button>') +
+        '<button type="button" class="btn btn-ghost btn-petit" data-gestion="retirer" data-email="' + email + '">Retirer</button>' +
+        "</div>";
+      return '<tr class="' + (a.bloque ? "collab-bloque" : "") + '">' +
+        "<td>" + echapper(a.nom || "—") + "</td>" +
+        "<td>" + email + "</td>" +
+        "<td>" + (principal ? "Administrateur principal" : "Collaborateur") + "</td>" +
+        "<td>" + (!gestionAvancee ? "—" : a.bloque ? '<span class="collab-statut collab-statut-bloque">Bloqué</span>' : '<span class="collab-statut">Actif</span>') + "</td>" +
+        "<td>" + new Date(a.created_at).toLocaleDateString("fr-FR") + "</td>" +
+        "<td>" + actions + "</td>" +
+        "</tr>";
+    }).join("");
+    if (!liste.length) listeAdmins.innerHTML = '<tr><td colspan="6" class="admin-sub">Aucun compte pour cette recherche.</td></tr>';
   }
 
   function genererMdp() {
