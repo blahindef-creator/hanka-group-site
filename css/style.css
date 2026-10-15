@@ -1121,6 +1121,7 @@ input[type="file"] { padding: 0.5rem; background: var(--white); }
 .auth-form .btn { margin-top: 0.75rem; }
 .auth-intro { margin: 0 0 0.75rem; color: var(--gray-600); font-size: 0.92rem; }
 .auth-aide { margin: 0.5rem 0 0; font-size: 0.85rem; color: var(--gray-600); text-align: center; }
+.auth-titre { margin: 0 0 0.25rem; font-size: 1.5rem; color: var(--blue-dark); }
 .auth-aide a { color: var(--blue); font-weight: 600; }
 
 /* --- Espace client --- */
