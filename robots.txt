@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://blahindef-creator.github.io/hanka-group-site/sitemap.xml
+Sitemap: https://hankagroup.ci/sitemap.xml
