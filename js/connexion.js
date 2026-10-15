@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }).then(function (res) {
       if (res.error) {
         bouton.disabled = false;
-        return erreur("c-erreur", "Email ou mot de passe incorrect.");
+        return erreur("c-erreur", /banned/i.test(res.error.message)
+          ? "Ce compte est bloqué. Contactez l'administratrice principale de HANKA GROUP."
+          : "Email ou mot de passe incorrect.");
       }
       orienter();
     });

@@ -1514,3 +1514,9 @@ a.pub-image:hover img { transform: scale(1.03); }
 .contact-merci h3 { margin: 0 0 0.4rem; color: var(--blue-dark); font-size: 1.3rem; }
 .contact-merci p { margin: 0 0 0.4rem; color: var(--gray-600); }
 .admin-main section.admin-login { padding: 2rem; }
+
+/* Collaborateurs : statut et actions */
+.collab-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.collab-statut { display: inline-block; padding: 0.15rem 0.55rem; border-radius: 999px; background: #e3f4e8; color: #1f7a3e; font-size: 0.75rem; font-weight: 800; }
+.collab-statut-bloque { background: #fde4e4; color: #b42318; }
+.admin-table tr.collab-bloque td { opacity: 0.75; }

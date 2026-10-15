@@ -14,7 +14,20 @@ document.addEventListener("DOMContentLoaded", function () {
     el.hidden = !texte;
   }
 
+  // Les collaborateurs ne réinitialisent pas eux-mêmes leur mot de passe : c'est l'administrateur principal qui le fait
   function afficherNouveau(session) {
+    hankaSb.from("admins").select("role").ilike("email", session.user.email).maybeSingle().then(function (r) {
+      if (r.data && r.data.role === "collaborateur") {
+        hankaSb.auth.signOut();
+        formDemande.hidden = false;
+        formNouveau.hidden = true;
+        return message("d-erreur", "Votre mot de passe de collaborateur est géré par l'administratrice principale de HANKA GROUP. Demandez-lui de vous en attribuer un nouveau.");
+      }
+      afficherFormulaireNouveau(session);
+    });
+  }
+
+  function afficherFormulaireNouveau(session) {
     formDemande.hidden = true;
     formNouveau.hidden = false;
     document.getElementById("n-compte").textContent = "Compte : " + session.user.email + ". Choisissez votre nouveau mot de passe.";

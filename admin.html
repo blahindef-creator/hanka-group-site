@@ -268,6 +268,7 @@
       <div class="admin-carte">
         <h1>Mon compte</h1>
         <p class="admin-sub" id="compte-infos"></p>
+        <p class="admin-sub" id="mdp-gere-par-admin" hidden>Votre mot de passe est géré par l'administratrice principale. Pour le changer, adressez-vous à elle.</p>
         <form id="form-mdp" class="admin-form">
           <h2>Changer mon mot de passe</h2>
           <label for="mdp-nouveau">Nouveau mot de passe</label>
@@ -291,7 +292,7 @@
         <div class="admin-table-wrap">
           <table class="admin-table admin-table-compacte">
             <thead>
-              <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Ajouté le</th><th></th></tr>
+              <tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Statut</th><th>Ajouté le</th><th>Actions</th></tr>
             </thead>
             <tbody id="liste-admins"></tbody>
           </table>
@@ -310,12 +311,12 @@
               <input type="email" id="collab-email" required>
             </div>
           </div>
-          <label for="collab-mdp">Mot de passe provisoire</label>
+          <label for="collab-mdp">Mot de passe</label>
           <div class="input-bouton">
             <input type="text" id="collab-mdp" minlength="8" required autocomplete="off">
             <button type="button" class="btn btn-ghost" id="btn-generer-mdp">Générer</button>
           </div>
-          <p class="form-note">Transmettez ces identifiants au collaborateur. Il lui sera demandé de choisir son propre mot de passe à la première connexion.</p>
+          <p class="form-note">Transmettez ces identifiants au collaborateur. Son mot de passe ne peut être changé que par vous, depuis cette page (bouton « Nouveau mot de passe »).</p>
           <p class="admin-succes" id="collab-succes" hidden></p>
           <button type="submit" class="btn btn-primary">Créer le compte</button>
         </form>

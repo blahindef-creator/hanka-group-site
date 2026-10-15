@@ -156,6 +156,11 @@ document.addEventListener("DOMContentLoaded", function () {
     sb.from("admins").select("role").ilike("email", session.user.email).maybeSingle().then(function (r) {
       estPrincipal = !!(r.data && r.data.role === "principal");
       document.getElementById("onglet-collaborateurs").hidden = !estPrincipal;
+      // Le mot de passe d'un collaborateur est géré par l'administrateur principal
+      var collaborateur = !!(r.data && r.data.role === "collaborateur");
+      document.getElementById("form-mdp").hidden = collaborateur;
+      document.getElementById("mdp-gere-par-admin").hidden = !collaborateur;
+      if (collaborateur) document.getElementById("alerte-mdp").hidden = true;
       if (!vues.collaborateurs.hidden) {
         if (estPrincipal) chargerAdmins();
         else afficherOnglet("demandes");
@@ -176,7 +181,9 @@ document.addEventListener("DOMContentLoaded", function () {
       password: document.getElementById("admin-mdp").value
     }).then(function (res) {
       if (res.error) {
-        err.textContent = "Email ou mot de passe incorrect.";
+        err.textContent = /banned/i.test(res.error.message)
+          ? "Ce compte est bloqué. Contactez l'administratrice principale de HANKA GROUP."
+          : "Email ou mot de passe incorrect.";
         err.hidden = false;
       }
     });
@@ -528,12 +535,22 @@ document.addEventListener("DOMContentLoaded", function () {
     appelerGestion({ action: "lister" }).then(function (d) {
       listeAdmins.innerHTML = d.admins.map(function (a) {
         var principal = a.role === "principal";
-        return "<tr>" +
+        var email = echapper(a.email);
+        var actions = principal ? "" :
+          '<div class="collab-actions">' +
+          '<button type="button" class="btn btn-ghost btn-petit" data-gestion="mot_de_passe" data-email="' + email + '">Nouveau mot de passe</button>' +
+          (a.bloque
+            ? '<button type="button" class="btn btn-ghost btn-petit" data-gestion="activer" data-email="' + email + '">Réactiver</button>'
+            : '<button type="button" class="btn btn-ghost btn-petit" data-gestion="bloquer" data-email="' + email + '">Bloquer</button>') +
+          '<button type="button" class="btn btn-ghost btn-petit" data-gestion="retirer" data-email="' + email + '">Retirer</button>' +
+          "</div>";
+        return '<tr class="' + (a.bloque ? "collab-bloque" : "") + '">' +
           "<td>" + echapper(a.nom || "—") + "</td>" +
-          "<td>" + echapper(a.email) + "</td>" +
+          "<td>" + email + "</td>" +
           "<td>" + (principal ? "Administrateur principal" : "Collaborateur") + "</td>" +
+          "<td>" + (a.bloque ? '<span class="collab-statut collab-statut-bloque">Bloqué</span>' : '<span class="collab-statut">Actif</span>') + "</td>" +
           "<td>" + new Date(a.created_at).toLocaleDateString("fr-FR") + "</td>" +
-          "<td>" + (principal ? "" : '<button type="button" class="btn btn-ghost btn-petit" data-retirer="' + echapper(a.email) + '">Retirer</button>') + "</td>" +
+          "<td>" + actions + "</td>" +
           "</tr>";
       }).join("");
     }).catch(function (err) {
@@ -542,32 +559,63 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  function genererMdp() {
+    var lettres = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+    var octets = new Uint32Array(12);
+    window.crypto.getRandomValues(octets);
+    return "Hanka-" + Array.prototype.map.call(octets, function (n) {
+      return lettres[n % lettres.length];
+    }).join("");
+  }
+
+  // Actions sur un collaborateur : nouveau mot de passe, bloquer / réactiver, retirer
+  var CONFIRMATIONS = {
+    mot_de_passe: "Confirmer : nouveau mot de passe ?",
+    bloquer: "Confirmer le blocage ?",
+    retirer: "Confirmer le retrait ?"
+  };
+  var ECHECS = { mot_de_passe: "Changement de mot de passe impossible", bloquer: "Blocage impossible", activer: "Réactivation impossible", retirer: "Retrait impossible" };
+
   listeAdmins.addEventListener("click", function (e) {
-    var b = e.target.closest("[data-retirer]");
+    var b = e.target.closest("[data-gestion]");
     if (!b) return;
-    var email = b.getAttribute("data-retirer");
+    var action = b.getAttribute("data-gestion");
+    var email = b.getAttribute("data-email");
+    var succes = document.getElementById("collab-succes");
     // Confirmation en deux clics, sans boîte de dialogue
-    if (b.getAttribute("data-confirmer") !== "1") {
+    if (CONFIRMATIONS[action] && b.getAttribute("data-confirmer") !== "1") {
       b.setAttribute("data-confirmer", "1");
-      b.textContent = "Confirmer le retrait ?";
+      b.textContent = CONFIRMATIONS[action];
       b.classList.add("btn-danger");
       return;
     }
+    erreurCollab.hidden = true;
+    succes.hidden = true;
     b.disabled = true;
-    appelerGestion({ action: "retirer", email: email }).then(chargerAdmins).catch(function (err) {
-      erreurCollab.textContent = "Retrait impossible : " + err.message;
+    var corpsRequete = { action: action, email: email };
+    if (action === "mot_de_passe") corpsRequete.mot_de_passe = genererMdp();
+
+    appelerGestion(corpsRequete).then(function () {
+      if (action === "mot_de_passe") {
+        succes.innerHTML = "Nouveau mot de passe de <strong>" + echapper(email) + "</strong> : <strong>" + echapper(corpsRequete.mot_de_passe) + "</strong><br>Transmettez-le au collaborateur : l'ancien ne fonctionne plus.";
+      } else {
+        succes.innerHTML = {
+          bloquer: "<strong>" + echapper(email) + "</strong> est bloqué : il ne peut plus se connecter.",
+          activer: "<strong>" + echapper(email) + "</strong> est réactivé : il peut de nouveau se connecter.",
+          retirer: "<strong>" + echapper(email) + "</strong> a été retiré."
+        }[action];
+      }
+      succes.hidden = false;
+      chargerAdmins();
+    }).catch(function (err) {
+      erreurCollab.textContent = ECHECS[action] + " : " + err.message;
       erreurCollab.hidden = false;
       b.disabled = false;
     });
   });
 
   document.getElementById("btn-generer-mdp").addEventListener("click", function () {
-    var lettres = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
-    var octets = new Uint32Array(12);
-    window.crypto.getRandomValues(octets);
-    document.getElementById("collab-mdp").value = "Hanka-" + Array.prototype.map.call(octets, function (n) {
-      return lettres[n % lettres.length];
-    }).join("");
+    document.getElementById("collab-mdp").value = genererMdp();
   });
 
   document.getElementById("form-collab").addEventListener("submit", function (e) {
@@ -584,7 +632,7 @@ document.addEventListener("DOMContentLoaded", function () {
     appelerGestion({ action: "creer", nom: nom, email: email, mot_de_passe: mdp }).then(function (d) {
       succes.innerHTML = d.compte_existant
         ? "Accès admin donné à <strong>" + echapper(email) + "</strong> (compte déjà existant : son mot de passe actuel reste valable)."
-        : "Compte créé. Identifiants à transmettre :<br>Email : <strong>" + echapper(email) + "</strong><br>Mot de passe provisoire : <strong>" + echapper(mdp) + "</strong><br>Adresse : " + echapper(location.href.split("#")[0]);
+        : "Compte créé. Identifiants à transmettre :<br>Email : <strong>" + echapper(email) + "</strong><br>Mot de passe : <strong>" + echapper(mdp) + "</strong><br>Adresse : " + echapper(location.href.split("#")[0]);
       succes.hidden = false;
       e.target.reset();
       chargerAdmins();
