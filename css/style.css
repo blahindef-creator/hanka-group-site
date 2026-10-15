@@ -1531,3 +1531,13 @@ a.pub-image:hover img { transform: scale(1.03); }
 @media (max-width: 640px) {
   .admin-recherche select, .admin-recherche-date { flex: 1 1 45%; }
 }
+
+/* Suivi d'une demande sans compte */
+.suivi-resultat { padding: 1.5rem; }
+.suivi-resultat .espace-demande { box-shadow: none; border: 1px solid var(--gray-200); }
+.suivi-etapes { display: flex; gap: 0.35rem; list-style: none; margin: 1rem 0 0; padding: 0; }
+.suivi-etapes li { flex: 1; padding: 0.45rem 0.3rem; border-radius: 8px; background: var(--gray-100); color: var(--gray-600); font-size: 0.82rem; font-weight: 700; text-align: center; }
+.suivi-etapes li.fait { background: #e1eaff; color: var(--blue); }
+.suivi-etapes li.actuel { background: var(--blue); color: var(--white); }
+.done-suivi { margin: -0.75rem 0 1.5rem; font-size: 0.92rem; }
+.done-suivi a { color: var(--blue); font-weight: 700; }

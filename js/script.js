@@ -103,7 +103,10 @@ document.addEventListener("DOMContentLoaded", function () {
           if (!res.ok || !res.d.ok) throw new Error();
           form.hidden = true;
           var merci = document.getElementById("contact-merci");
-          if (res.d.numero) document.getElementById("contact-ref").textContent = "Référence de votre message : C" + res.d.numero;
+          if (res.d.numero) {
+            document.getElementById("contact-ref").textContent = "Référence de votre message : C" + res.d.numero;
+            hankaLienSuivi("contact-suivi", "C" + res.d.numero);
+          }
           merci.hidden = false;
           merci.focus();
         })
@@ -115,3 +118,11 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+// Après une demande : lien vers la page de suivi, référence déjà remplie (suivi sans compte)
+function hankaLienSuivi(id, reference) {
+  var p = document.getElementById(id);
+  if (!p) return;
+  p.innerHTML = 'Notez cette référence : elle vous permet de <a href="suivi.html?ref=' + encodeURIComponent(reference) + '">suivre votre demande</a> à tout moment, sans créer de compte.';
+  p.hidden = false;
+}

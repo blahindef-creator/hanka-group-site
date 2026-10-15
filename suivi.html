@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivre ma demande — HANKA GROUP</title>
+<meta name="description" content="Suivez l’avancement de votre demande HANKA GROUP avec votre référence, sans créer de compte.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css?v=202610151812">
+</head>
+<body>
+
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="logo" aria-label="HANKA GROUP — accueil">
+      <img src="assets/logo-hanka-mark-clair.png" alt="Logo HANKA GROUP">
+      <span class="logo-text">
+        <span class="logo-name">HANKA</span>
+        <span class="logo-group">GROUP</span>
+      </span>
+    </a>
+    <button class="nav-toggle" aria-label="Ouvrir le menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Accueil</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="a-propos.html">À propos</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-droite">
+      <a href="connexion.html" class="nav-connexion"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Se connecter</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="auth-section">
+    <div class="container">
+      <div class="auth-carte">
+        <form id="form-suivi" class="auth-form" novalidate>
+          <h1 class="auth-titre">Suivre ma demande</h1>
+          <p class="auth-intro">Pas besoin de compte : indiquez la référence reçue après votre demande (ex. <strong>n° 12</strong>, <strong>M3</strong> ou <strong>C5</strong>) et le téléphone ou l'email que vous avez donné.</p>
+          <label for="s-ref">Référence de la demande</label>
+          <input type="text" id="s-ref" placeholder="Ex. 12, M3, C5" autocomplete="off" maxlength="20" required>
+          <label for="s-contact">Téléphone ou email utilisé</label>
+          <input type="text" id="s-contact" placeholder="Ex. 07 01 02 03 04" autocomplete="tel" maxlength="200" required>
+          <p class="wizard-error" id="s-erreur" hidden></p>
+          <button type="submit" class="btn btn-primary">Voir l'état de ma demande</button>
+          <p class="auth-aide">Vous avez un compte client ? <a href="connexion.html">Connectez-vous</a> pour voir toutes vos demandes.</p>
+        </form>
+        <div id="s-resultat" class="suivi-resultat" hidden aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <img class="footer-logo" src="assets/logo-hanka-group-clair.png" alt="HANKA GROUP">
+        <p style="font-size:0.88rem; opacity:0.85; max-width:32ch;">Votre partenaire pour la création d'entreprise, la formation et le développement de votre activité à Abidjan.</p>
+        <p class="footer-tagline">Innover · Construire · Valoriser</p>
+      </div>
+      <div>
+        <h3>Navigation</h3>
+        <ul>
+          <li><a href="index.html">Accueil</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="a-propos.html">À propos</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="suivi.html">Suivre ma demande</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <ul>
+          <li><a href="tel:+2250172976418">+225 01 72 97 64 18</a></li>
+          <li><a href="mailto:hanekatehe@gmail.com">hanekatehe@gmail.com</a></li>
+          <li>Abidjan, Riviera 2 — Côte d'Ivoire</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="year"></span> HANKA GROUP. Tous droits réservés.
+    </div>
+  </div>
+</footer>
+
+<script src="js/script.js?v=202610151812"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js?v=202610151812"></script>
+
+<script src="js/data/creation-entreprise.js?v=1"></script>
+<script src="js/tarifs.js?v=1"></script>
+<script src="js/suivi.js?v=1"></script>
+<script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

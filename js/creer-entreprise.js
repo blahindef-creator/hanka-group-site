@@ -195,6 +195,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!res.ok || !res.data.ok) throw new Error(res.data && res.data.erreur);
         if (res.data.numero) {
           document.getElementById("done-ref").textContent = "Référence de votre demande : n° " + res.data.numero;
+          hankaLienSuivi("done-suivi", String(res.data.numero));
         }
         hankaFinParcours(res.data.compte);
         afficherEtape("fin");
